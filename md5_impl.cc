@@ -23,6 +23,8 @@
 #define GET(n) (ctx->block[(n)])
 #endif
 
+namespace md5 {
+
 static const void* md5_body(MD5_CTX *ctx, const void *data, uint32_t size) {
     const auto *ptr = (uint8_t*)data;
 
@@ -208,3 +210,5 @@ void md5_bin(const void *dat, size_t len, uint8_t out[16]) {
     md5_update(&c, dat, len);
     md5_final(out, &c);
 }
+
+} // namespace md5

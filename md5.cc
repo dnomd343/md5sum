@@ -1,9 +1,11 @@
 #include "md5sum.h"
 #include "md5def.h"
 
+namespace md5 {
+
 static char hb2hex(uint8_t hb) {
     hb &= 0xF;
-    return hb < 10 ? '0' + hb : hb - 10 + 'a';
+    return char(hb < 10 ? hb + '0' : hb - 10 + 'a');
 }
 
 std::string md5sum(const std::string &dat) {
@@ -33,8 +35,8 @@ std::string md5file(std::FILE *file) {
 	MD5_CTX c;
     md5_init(&c);
 
+    size_t len;
 	uint8_t out[16];
-	size_t len = 0;
     char buff[BUFSIZ];
 	while ((len = std::fread(buff, sizeof(char), BUFSIZ, file)) > 0) {
 		md5_update(&c, buff, len);
@@ -48,3 +50,5 @@ std::string md5file(std::FILE *file) {
     }
 	return res;
 }
+
+} // namespace md5
