@@ -24,12 +24,19 @@ int main() {
     md5::md5_ctx c;
     dump_ctx(&c);
 
-    md5::md5_process(&c, data.c_str(), data.size());
-    md5::md5_process(&c, data.c_str(), data.size());
+    // md5::md5_update(&c, data.c_str(), data.size());
+    // md5::md5_update(&c, data.c_str(), data.size());
+    // dump_ctx(&c);
+
+    // md5::md5_reset(&c);
+    // md5::md5_update(&c, data.c_str(), data.size());
+    // md5::md5_update(&c, data.c_str(), data.size());
+    // dump_ctx(&c);
+
+    md5::md5_final(&c, data.c_str(), 0);
     dump_ctx(&c);
 
     md5::md5_reset(&c);
-    md5::md5_process(&c, data.c_str(), data.size());
-    md5::md5_process(&c, data.c_str(), data.size());
+    md5::md5_final(&c, data.c_str(), data.size());
     dump_ctx(&c);
 }

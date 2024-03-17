@@ -17,7 +17,13 @@ struct md5_ctx {
     uint64_t size = 0;
 };
 
-void md5_reset(struct md5_ctx *ctx);
-void md5_process(struct md5_ctx *ctx, const void *buffer, uint64_t len);
+/// Reset md5 ctx with algorithm constants.
+void md5_reset(md5_ctx *ctx);
+
+/// Update md5 ctx with specified data, note that `len` is a multiple of 64.
+void md5_update(md5_ctx *ctx, const void *buffer, uint64_t len);
+
+/// Update and end the md5 hash with the specified data, the value of `len` has no limit.
+void md5_final(md5_ctx *ctx, const void *buffer, uint64_t len);
 
 } // namespace md5

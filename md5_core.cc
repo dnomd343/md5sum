@@ -1,3 +1,4 @@
+#include <cstring>
 #include "md5_core.h"
 #include "md5_math.h"
 
@@ -13,11 +14,11 @@
 
 #define CYCLIC(w, s) (w = (w << s) | (w >> (32 - s)))
 
-#define STEP(i, f, a, b, c, d)               \
-    do {                                     \
-        a += f(b, c, d) + data[K(i)] + T(i); \
-        CYCLIC(a, S(i));                     \
-        a += b;                              \
+#define STEP(i, f, a, b, c, d)                \
+    do {                                      \
+        a += f(b, c, d) + block[K(i)] + T(i); \
+        CYCLIC(a, S(i));                      \
+        a += b;                               \
     } while (0)
 
 #define FF(i, ...) STEP((0x00 | i), F, __VA_ARGS__)
@@ -33,14 +34,16 @@
 
 namespace md5 {
 
-consteval int K(int index) {
-    int i = index >> 4;
+static const unsigned char Padding[64] {0x80};
+
+consteval int K(int index) { // index -> [0, 64)
+    auto i = index >> 4;
     const int step[] = {1, 5, 3, 7};
     const int begin[] = {0, 1, 5, 0};
     return (begin[i] + step[i] * index) & 0b1111;
 }
 
-consteval int S(int index) {
+consteval int S(int index) { // index -> [0, 64)
     const int map[][4] = {
         {7, 12, 17, 22},
         {5, 9, 14, 20},
@@ -50,12 +53,12 @@ consteval int S(int index) {
     return map[index >> 4][index & 0b11];
 }
 
-consteval uint32_t T(int index) {
-    double val = math::sin(index + 1);
-    return uint32_t(std::abs(val) * 0x100000000);
+consteval uint32_t T(int index) { // index -> [0, 64)
+    auto val = math::sin(index + 1);
+    return static_cast<uint32_t>(std::abs(val) * 0x100000000);
 }
 
-void md5_reset(struct md5_ctx *ctx) {
+void md5_reset(md5_ctx *ctx) {
     ctx->A = MD5_A;
     ctx->B = MD5_B;
     ctx->C = MD5_C;
@@ -63,40 +66,58 @@ void md5_reset(struct md5_ctx *ctx) {
     ctx->size = 0;
 }
 
-void md5_process(struct md5_ctx *ctx, const void *buffer, uint64_t len) {
-    const auto *data = (uint32_t *)buffer;
-    const auto *limit = data + (len >> 2);
+void md5_update(md5_ctx *ctx, const void *data, uint64_t len) {
+    auto *block = reinterpret_cast<const uint32_t *>(data);
+    auto *limit = block + (len >> 2);
+    auto A = ctx->A;
+    auto B = ctx->B;
+    auto C = ctx->C;
+    auto D = ctx->D;
 
-    uint32_t A = ctx->A;
-    uint32_t B = ctx->B;
-    uint32_t C = ctx->C;
-    uint32_t D = ctx->D;
-
-    while (data < limit) {
-        uint32_t A_ = A;
-        uint32_t B_ = B;
-        uint32_t C_ = C;
-        uint32_t D_ = D;
-
+    while (block < limit) {
+        auto A_ = A;
+        auto B_ = B;
+        auto C_ = C;
+        auto D_ = D;
         MD5_ROUND(FF)
         MD5_ROUND(GG)
         MD5_ROUND(HH)
         MD5_ROUND(II)
-
         A += A_;
         B += B_;
         C += C_;
         D += D_;
-
-        data += 16; // 512 bits
+        block += 16; // move to next block
     }
 
     ctx->A = A;
     ctx->B = B;
     ctx->C = C;
     ctx->D = D;
+    ctx->size += len; // processed size in byte
+}
 
-    ctx->size += len; // processed size
+void md5_final(md5_ctx *ctx, const void *data, uint64_t len) {
+    if (len >= 120) { // len -> [64 + 56, INF)
+        auto size = len & ~(uint64_t)0b111111;
+        md5_update(ctx, data, size);
+        data = reinterpret_cast<const char*>(data) + size;
+        len &= 0b111111; // len -> [0, 64)
+    }
+
+    unsigned char buffer[128]; // 2 blocks
+    std::memcpy(buffer, data, len);
+    uint64_t total = (ctx->size + len) << 3; // total number in bit
+
+    if (len < 56) { // len -> [0, 56)
+        std::memcpy(buffer + len, Padding, 56 - len);
+        std::memcpy(buffer + 56, &total, 8);
+        md5_update(ctx, buffer, 64); // update 1 block
+    } else { // len -> [56, 64 + 56)
+        std::memcpy(buffer + len, Padding, 120 - len);
+        std::memcpy(buffer + 120, &total, 8);
+        md5_update(ctx, buffer, 128); // update 2 blocks
+    }
 }
 
 } // namespace md5
