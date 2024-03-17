@@ -59,14 +59,6 @@ consteval uint32_t T(int index) { // index -> [0, 64)
     return static_cast<uint32_t>(std::abs(val) * 0x100000000);
 }
 
-void MD5::md5_reset(md5_ctx *ctx) {
-    ctx->A = MD5_A;
-    ctx->B = MD5_B;
-    ctx->C = MD5_C;
-    ctx->D = MD5_D;
-    ctx->size = 0;
-}
-
 void MD5::md5_update(md5_ctx *ctx, const void *data, uint64_t len) {
     auto *block = reinterpret_cast<const uint32_t *>(data);
     auto *limit = block + (len >> 2);
@@ -95,7 +87,7 @@ void MD5::md5_update(md5_ctx *ctx, const void *data, uint64_t len) {
     ctx->B = B;
     ctx->C = C;
     ctx->D = D;
-    ctx->size += len; // processed size in byte
+    ctx->size += len;
 }
 
 void MD5::md5_final(md5_ctx *ctx, const void *data, uint64_t len) {

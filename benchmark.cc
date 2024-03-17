@@ -13,11 +13,16 @@ std::string test_data() {
 static void BM_MD5_NEXT(benchmark::State &state) {
     const auto data = test_data();
 
-    md5::MD5::md5_ctx c;
-    md5::MD5::md5_reset(&c);
+//    md5::MD5::md5_ctx c;
+//    md5::MD5::md5_reset(&c);
+
+    md5::MD5 kk;
 
     for (auto _ : state) {
-        md5::MD5::md5_update(&c, data.c_str(), 64);
+
+        kk.Update(data.c_str(), 64);
+
+//        md5::MD5::md5_update(&c, data.c_str(), 64);
     }
 }
 

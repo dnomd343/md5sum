@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_compile_options(-fno-rtti -fno-exceptions -Wall -Wextra)
 
-add_library(md5sum STATIC src/md5_core.cc)
+add_library(md5sum STATIC src/md5_core.cc src/md5_wrapper.cc)
 target_include_directories(md5sum INTERFACE src/)
 
 include(third_party/ThirdParty.cmake)
