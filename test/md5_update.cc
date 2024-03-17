@@ -1,6 +1,6 @@
-#include <iostream>
+#include <gtest/gtest.h>
 
-#include "md5_core.h"
+#include "md5.h"
 
 std::string test_data() {
     char data[64];
@@ -10,7 +10,7 @@ std::string test_data() {
     return {data, data + 64};
 }
 
-void dump_ctx(const md5::md5_ctx *c) {
+void dump_ctx(const md5::MD5::md5_ctx *c) {
     std::cout << std::hex << c->A << std::endl;
     std::cout << std::hex << c->B << std::endl;
     std::cout << std::hex << c->C << std::endl;
@@ -18,10 +18,10 @@ void dump_ctx(const md5::md5_ctx *c) {
     std::cout << std::dec << c->size << std::endl;
 }
 
-int main() {
+TEST(md5sum, main) {
     auto data = test_data() + test_data() + test_data() + test_data();
 
-    md5::md5_ctx c;
+    md5::MD5::md5_ctx c;
     dump_ctx(&c);
 
     // md5::md5_update(&c, data.c_str(), data.size());
@@ -33,10 +33,11 @@ int main() {
     // md5::md5_update(&c, data.c_str(), data.size());
     // dump_ctx(&c);
 
-    md5::md5_final(&c, data.c_str(), 0);
+    md5::MD5::md5_final(&c, data.c_str(), 0);
     dump_ctx(&c);
 
-    md5::md5_reset(&c);
-    md5::md5_final(&c, data.c_str(), data.size());
+    md5::MD5::md5_reset(&c);
+    md5::MD5::md5_final(&c, data.c_str(), data.size());
     dump_ctx(&c);
+
 }

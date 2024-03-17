@@ -1,5 +1,6 @@
 #include <cstring>
-#include "md5_core.h"
+
+#include "md5.h"
 #include "md5_math.h"
 
 #define RA A, B, C, D
@@ -58,7 +59,7 @@ consteval uint32_t T(int index) { // index -> [0, 64)
     return static_cast<uint32_t>(std::abs(val) * 0x100000000);
 }
 
-void md5_reset(md5_ctx *ctx) {
+void MD5::md5_reset(md5_ctx *ctx) {
     ctx->A = MD5_A;
     ctx->B = MD5_B;
     ctx->C = MD5_C;
@@ -66,7 +67,7 @@ void md5_reset(md5_ctx *ctx) {
     ctx->size = 0;
 }
 
-void md5_update(md5_ctx *ctx, const void *data, uint64_t len) {
+void MD5::md5_update(md5_ctx *ctx, const void *data, uint64_t len) {
     auto *block = reinterpret_cast<const uint32_t *>(data);
     auto *limit = block + (len >> 2);
     auto A = ctx->A;
@@ -97,7 +98,7 @@ void md5_update(md5_ctx *ctx, const void *data, uint64_t len) {
     ctx->size += len; // processed size in byte
 }
 
-void md5_final(md5_ctx *ctx, const void *data, uint64_t len) {
+void MD5::md5_final(md5_ctx *ctx, const void *data, uint64_t len) {
     if (len >= 120) { // len -> [64 + 56, INF)
         auto size = len & ~(uint64_t)0b111111;
         md5_update(ctx, data, size);
