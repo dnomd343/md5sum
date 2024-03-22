@@ -4,46 +4,6 @@
 
 using namespace md5;
 
-std::string test_data() {
-    char data[64];
-    for (char i = 0; i < 64; ++i) {
-        data[i] = i;
-    }
-    return {data, data + 64};
-}
-
-//void dump_ctx(const md5::MD5::md5_ctx *c) {
-//    std::cout << std::hex << c->A << std::endl;
-//    std::cout << std::hex << c->B << std::endl;
-//    std::cout << std::hex << c->C << std::endl;
-//    std::cout << std::hex << c->D << std::endl;
-//    std::cout << std::dec << c->size << std::endl;
-//}
-
-TEST(md5sum, main) {
-    auto data = test_data() + test_data() + test_data() + test_data();
-
-//    md5::MD5::md5_ctx c;
-//    dump_ctx(&c);
-
-    // md5::md5_update(&c, data.c_str(), data.size());
-    // md5::md5_update(&c, data.c_str(), data.size());
-    // dump_ctx(&c);
-
-    // md5::md5_reset(&c);
-    // md5::md5_update(&c, data.c_str(), data.size());
-    // md5::md5_update(&c, data.c_str(), data.size());
-    // dump_ctx(&c);
-
-//    md5::MD5::md5_final(&c, data.c_str(), 0);
-//    dump_ctx(&c);
-//
-//    md5::MD5::md5_reset(&c);
-//    md5::MD5::md5_final(&c, data.c_str(), data.size());
-//    dump_ctx(&c);
-
-}
-
 TEST(md5sum, hash) {
     auto test_data = [](uint8_t size) -> std::string {
         std::string data {};
@@ -325,4 +285,24 @@ TEST(md5sum, hash) {
     EXPECT_EQ(MD5::Hash(test_data(0xfd)), "5089797486c967716d69b2ed0f9ba876");
     EXPECT_EQ(MD5::Hash(test_data(0xfe)), "7bdac450b9343317aa89895d4dda181e");
     EXPECT_EQ(MD5::Hash(test_data(0xff)), "11b7aaa64c413d2f0fccf893881c46a2");
+}
+
+
+TEST(md5sum, update) {
+
+    std::string test_data {};
+    test_data.resize(256 * 256);
+
+    for (int i = 0; i < test_data.size(); ++i) {
+        test_data[i] = i & 0xff;
+    }
+
+    for (int round = 1; round <= 256; ++round) {
+        MD5 md5_obj;
+        for (int i = 0; i < 256; ++i) {
+            md5_obj.Update(test_data.data() + i * round, round);
+        }
+        EXPECT_EQ(md5_obj.Final().Digest(), MD5::Hash(test_data.data(), 256 * round));
+    }
+
 }

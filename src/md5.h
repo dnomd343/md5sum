@@ -3,10 +3,11 @@
 #include <string>
 #include <cstdint>
 
+static_assert(sizeof(uintptr_t) == 8,
+    "Project only works on 64-bits architecture.");
+
 static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
     "Project only works on little-endian architecture.");
-
-// TODO: static_assert for 64-bit arch
 
 namespace md5 {
 
@@ -14,16 +15,17 @@ class MD5 {
 public:
     MD5() = default;
 
-    MD5& Reset();
-    // TODO: using std::string_view
-    MD5& Update(const void *buffer, uint64_t len);
     MD5& Final();
+    MD5& Reset();
 
-    [[nodiscard]] std::string Digest();
-    [[nodiscard]] std::string String();
+    MD5& Update(const std::string_view &data);
+    MD5& Update(const void *buffer, uint64_t len);
+
+    [[nodiscard]] std::string Digest() const;
 
 public:
     static std::string Hash(const std::string_view &data);
+    static std::string Hash(const void *data, uint64_t len);
 
 private:
     static constexpr uint32_t MD5_A = 0x67452301;
@@ -42,7 +44,7 @@ private:
 private:
     md5_ctx ctx_;
     char buffer_[64] {};
-    char buffer_size_ = 0;
+    uint64_t buffer_size_ = 0;
 
 private:
     /// Update md5 ctx with specified data, note that `len` is a multiple of 64.

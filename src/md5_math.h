@@ -44,7 +44,7 @@ consteval double sin(double x) {
     if (std::abs(x) > PI / 2) {
         x = ((x > 0) ? 1 : -1) * PI - x; // -PI / 2 < x < PI / 2
     }
-    return sin_core(x);
+    return sin_core(x); // closer to 0 for better accuracy
 }
 
 } // namespace md5::math

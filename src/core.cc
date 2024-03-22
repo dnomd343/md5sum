@@ -35,13 +35,12 @@
 
 namespace md5 {
 
-static const unsigned char Padding[64] {0x80};
+static const unsigned char Padding[64] {0x80, /* 0x00, ... */};
 
 consteval int K(int index) { // index -> [0, 64)
-    auto i = index >> 4;
     const int step[] = {1, 5, 3, 7};
     const int begin[] = {0, 1, 5, 0};
-    return (begin[i] + step[i] * index) & 0b1111;
+    return (begin[index >> 4] + step[index >> 4] * index) & 0b1111;
 }
 
 consteval int S(int index) { // index -> [0, 64)
