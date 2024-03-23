@@ -15,16 +15,26 @@ class MD5 {
 public:
     MD5() = default;
 
-    MD5& Final();
+    /// Reset for next round of hashing.
     MD5& Reset();
 
+    /// Update md5 hash with specified data.
     MD5& Update(const std::string_view &data);
-    MD5& Update(const void *buffer, uint64_t len);
 
+    /// Update md5 hash with specified data.
+    MD5& Update(const void *data, uint64_t len);
+
+    /// Stop streaming updates and calculate result.
+    MD5& Final();
+
+    /// Get the string result of md5.
     [[nodiscard]] std::string Digest() const;
 
 public:
+    /// Calculate the md5 hash value of the specified data.
     static std::string Hash(const std::string_view &data);
+
+    /// Calculate the md5 hash value of the specified data.
     static std::string Hash(const void *data, uint64_t len);
 
 private:
@@ -44,14 +54,15 @@ private:
 private:
     md5_ctx ctx_;
     char buffer_[64] {};
-    uint64_t buffer_size_ = 0;
+    uint64_t buffer_size_ = 0; // size < 64
 
-private:
-    /// Update md5 ctx with specified data, note that `len` is a multiple of 64.
-    static void md5_update(md5_ctx *ctx, const void *buffer, uint64_t len);
+    /// Update md5 ctx with specified data, and return the pointer of unprocessed data (< 64 bytes).
+    const void* UpdateImpl(const void *data, uint64_t len);
 
-    /// Update and end the md5 hash with the specified data, the value of `len` has no limit.
-    static void md5_final(md5_ctx *ctx, const void *buffer, uint64_t len);
+    /// Update and final the md5 hash with the specified data.
+    void FinalImpl(const void *data, uint64_t len);
 };
 
 } // namespace md5
+
+#include "md5.inc"

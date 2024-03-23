@@ -20,6 +20,15 @@ static void MD5_Update(benchmark::State &state) {
     }
 }
 
+static void MD5_Digest(benchmark::State &state) {
+    md5::MD5 kk;
+    for (auto _ : state) {
+        auto pp = kk.Digest();
+    }
+}
+
 BENCHMARK(MD5_Update);
+
+BENCHMARK(MD5_Digest);
 
 BENCHMARK_MAIN();

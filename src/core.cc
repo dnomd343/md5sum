@@ -58,13 +58,13 @@ consteval uint32_t T(int index) { // index -> [0, 64)
     return static_cast<uint32_t>(std::abs(val) * 0x100000000);
 }
 
-void MD5::md5_update(md5_ctx *ctx, const void *data, uint64_t len) {
-    auto *block = reinterpret_cast<const uint32_t *>(data);
-    auto *limit = block + (len >> 2);
-    auto A = ctx->A;
-    auto B = ctx->B;
-    auto C = ctx->C;
-    auto D = ctx->D;
+const void* MD5::UpdateImpl(const void *data, uint64_t len) {
+    auto *block = static_cast<const uint32_t *>(data);
+    auto *limit = block + ((len &= ~0b111111ULL) >> 2);
+    auto A = ctx_.A;
+    auto B = ctx_.B;
+    auto C = ctx_.C;
+    auto D = ctx_.D;
 
     while (block < limit) {
         auto A_ = A;
@@ -82,33 +82,32 @@ void MD5::md5_update(md5_ctx *ctx, const void *data, uint64_t len) {
         block += 16; // move to next block
     }
 
-    ctx->A = A;
-    ctx->B = B;
-    ctx->C = C;
-    ctx->D = D;
-    ctx->size += len;
+    ctx_.A = A;
+    ctx_.B = B;
+    ctx_.C = C;
+    ctx_.D = D;
+    ctx_.size += len;
+    return static_cast<const void *>(limit);
 }
 
-void MD5::md5_final(md5_ctx *ctx, const void *data, uint64_t len) {
+void MD5::FinalImpl(const void *data, uint64_t len) {
     if (len >= 120) { // len -> [64 + 56, INF)
-        auto size = len & ~(uint64_t)0b111111;
-        md5_update(ctx, data, size);
-        data = reinterpret_cast<const char*>(data) + size;
+        data = UpdateImpl(data, len);
         len &= 0b111111; // len -> [0, 64)
     }
 
     unsigned char buffer[128]; // 2 blocks
     std::memcpy(buffer, data, len);
-    uint64_t total = (ctx->size + len) << 3; // total number in bit
+    uint64_t total = (ctx_.size + len) << 3; // total number in bit
 
     if (len < 56) { // len -> [0, 56)
         std::memcpy(buffer + len, Padding, 56 - len);
         std::memcpy(buffer + 56, &total, 8);
-        md5_update(ctx, buffer, 64); // update 1 block
+        UpdateImpl(buffer, 64); // update 1 block
     } else { // len -> [56, 64 + 56)
         std::memcpy(buffer + len, Padding, 120 - len);
         std::memcpy(buffer + 120, &total, 8);
-        md5_update(ctx, buffer, 128); // update 2 blocks
+        UpdateImpl(buffer, 128); // update 2 blocks
     }
 }
 
