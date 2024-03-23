@@ -7,9 +7,9 @@ option(MD5_ENABLE_BENCHMARK "Enable benchmark of the md5sum library." ON)
 set(CMAKE_CXX_STANDARD 20)
 add_compile_options(-Wall -Wextra)
 
-add_library(md5sum STATIC src/core.cc src/wrapper.cc)
+add_library(md5sum STATIC src/impl/core.cc src/impl/wrapper.cc)
 target_compile_options(md5sum PRIVATE -fno-rtti -fno-exceptions)
-target_include_directories(md5sum INTERFACE src/)
+target_include_directories(md5sum PUBLIC src/)
 
 include(third_party/ThirdParty.cmake)
 add_library(md5sum::md5sum ALIAS md5sum)

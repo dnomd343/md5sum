@@ -65,4 +65,4 @@ private:
 
 } // namespace md5
 
-#include "md5.inc"
+#include "impl/inline.inc"

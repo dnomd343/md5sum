@@ -4,7 +4,7 @@
 
 namespace md5::math {
 
-constexpr double PI = 3.141592653589793238462643L;
+constexpr double PI = 3.14159265358979323846264338327950;
 
 consteval double pow(double x, int n) {
     double res = 1;

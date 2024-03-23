@@ -4,6 +4,22 @@
 
 namespace md5 {
 
+static constexpr char HexTable[] = {
+    '0','1','2','3','4','5','6','7',
+    '8','9','a','b','c','d','e','f',
+};
+
+std::string MD5::Digest() const {
+    std::string result {};
+    result.resize(32);
+    auto *ptr = reinterpret_cast<const uint8_t *>(&ctx_);
+    for (int i = 0; i < 32; ++ptr) {
+        result[i++] = HexTable[*ptr >> 4];
+        result[i++] = HexTable[*ptr & 0b1111];
+    }
+    return result;
+}
+
 MD5& MD5::Update(const void *data, uint64_t len) {
     if (buffer_size_ != 0) {
         if (buffer_size_ + len < 64) { // buffer not filled
@@ -22,28 +38,11 @@ MD5& MD5::Update(const void *data, uint64_t len) {
 
     data = UpdateImpl(data, len);
     len &= 0b111111; // len -> [0, 64)
-
     if (len != 0) {
         std::memcpy(buffer_, data, len); // save remain data into buffer
         buffer_size_ = len;
     }
     return *this;
-}
-
-static constexpr char HexTable[] = {
-    '0','1','2','3','4','5','6','7',
-    '8','9','a','b','c','d','e','f',
-};
-
-std::string MD5::Digest() const {
-    std::string result {};
-    result.resize(32);
-    auto *src = reinterpret_cast<const uint8_t *>(&ctx_);
-    for (int i = 0; i < 32; ++src) {
-        result[i++] = HexTable[*src >> 4];
-        result[i++] = HexTable[*src & 0b1111];
-    }
-    return result;
 }
 
 } // namespace md5
