@@ -17,7 +17,7 @@ if (NOT 17 IN_LIST CXX_STANDARDS)
 endif()
 
 list(GET CXX_STANDARDS -1 MD5_CXX_STANDARD)  # Select the latest C++ standard
-message("MD5 CXX STANDARD: ${MD5_CXX_STANDARD}")
+message(STATUS "MD5 CXX Standard: ${MD5_CXX_STANDARD}")
 set(CMAKE_CXX_STANDARD ${MD5_CXX_STANDARD})
 add_compile_options(-Wall -Wextra)
 
@@ -30,8 +30,9 @@ add_library(md5sum::md5sum ALIAS md5sum)
 
 if (MD5_ENABLE_TESTING)
     enable_testing()
-    add_executable(md5_test test/constexpr.cc test/md5_update.cc)
+    add_executable(md5_test test/hash.cc test/simple.cc test/stream.cc)
     target_link_libraries(md5_test PRIVATE md5sum::md5sum GTest::gtest_main)
+    add_test(NAME md5_test COMMAND md5_test)
 endif()
 
 if (MD5_ENABLE_BENCHMARK)
