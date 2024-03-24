@@ -262,11 +262,10 @@ const std::array<std::pair<uint8_t, std::string_view>, 256> test_items {{
     {0xff, "11b7aaa64c413d2f0fccf893881c46a2"},
 }};
 
-constexpr std::string build_test_data(uint8_t index) {
-    std::string data {};
-    data.reserve(index);
+std::string build_test_data(uint8_t index) {
+    std::string data(index, 0x00);
     for (uint8_t i = 0; i < index; ++i) {
-        data.push_back(static_cast<char>(i));
+        data[i] = static_cast<char>(i);
     }
     return data;
 };

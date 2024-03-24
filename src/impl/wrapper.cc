@@ -5,8 +5,7 @@
 using ::md5::impl::MD5;
 
 std::string MD5::Digest() const {
-    std::string result {};
-    result.resize(32);
+    std::string result(32, 0x00);
     auto *ptr = reinterpret_cast<const uint8_t *>(&ctx_);
     for (int i = 0; i < 32; ++ptr) {
         result[i++] = HexTable[*ptr >> 4];

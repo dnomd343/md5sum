@@ -4,8 +4,7 @@
 using md5::MD5;
 
 TEST(md5sum, stream) {
-    std::string test_data {};
-    test_data.resize(256 * 256); // max -> 65536
+    std::string test_data(256 * 256, 0x00); // max -> 65536
     for (uint64_t i = 0; i < test_data.size(); ++i) {
         test_data[i] = static_cast<char>(i & 0xff);
     }
