@@ -10,9 +10,10 @@ static_assert(sizeof(uintptr_t) == 8,
 static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
     "Project only works on little-endian architecture.");
 
-#include "impl/algorithm.inc"
+#include "impl/value.inc"
+#include "impl/constexpr.inc"
 
-namespace md5::impl {
+namespace md5 {
 
 class MD5 {
 public:
@@ -33,7 +34,6 @@ public:
     /// Get the string result of md5.
     [[nodiscard]] std::string Digest() const;
 
-public:
     /// Calculate the md5 hash value of the specified data.
     static std::string Hash(const std::string_view &data);
 
@@ -47,6 +47,14 @@ public:
     static constexpr std::array<char, 32> HashCE(const char *data, uint64_t len);
 
 private:
+    struct md5_ctx {
+        uint32_t A = value::kA;
+        uint32_t B = value::kB;
+        uint32_t C = value::kC;
+        uint32_t D = value::kD;
+        uint64_t size = 0; // processed size in byte
+    };
+
     md5_ctx ctx_;
     char buffer_[64] {};
     uint64_t buffer_size_ = 0; // size < 64
@@ -58,13 +66,6 @@ private:
     void FinalImpl(const void *data, uint64_t len);
 };
 
-} // namespace md5::impl
+} // namespace md5
 
 #include "impl/inline.inc"
-#include "impl/constexpr.inc"
-
-namespace md5 {
-
-using MD5 = ::md5::impl::MD5;
-
-} // namespace md5

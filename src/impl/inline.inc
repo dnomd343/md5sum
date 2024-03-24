@@ -1,6 +1,6 @@
 #pragma once
 
-namespace md5::impl {
+namespace md5 {
 
 inline MD5& MD5::Reset() {
     ctx_.A = value::kA;
@@ -35,4 +35,8 @@ constexpr std::array<char, 32> MD5::HashCE(const std::string_view &data) {
     return HashCE(data.data(), data.size());
 }
 
-} // namespace md5::impl
+constexpr std::array<char, 32> MD5::HashCE(const char *data, const uint64_t len) {
+    return ce::Hash(data, len);
+}
+
+} // namespace md5

@@ -1,8 +1,8 @@
 #include "md5.h"
 
-using md5::impl::K;
-using md5::impl::S;
-using md5::impl::T;
+using md5::value::K;
+using md5::value::S;
+using md5::value::T;
 
 static_assert(K(0x00) == 0);
 static_assert(K(0x01) == 1);

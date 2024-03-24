@@ -1,8 +1,38 @@
+#include "md5.h"
 #include <cstring>
 
-#include "md5.h"
+using md5::MD5;
+using md5::value::K;
+using md5::value::S;
+using md5::value::T;
 
-using ::md5::impl::MD5;
+#define R1 A, B, C, D
+#define R2 D, A, B, C
+#define R3 C, D, A, B
+#define R4 B, C, D, A
+
+#define F(x, y, z) (z ^ (x & (y ^ z)))
+#define G(x, y, z) (y ^ (z & (x ^ y)))
+#define H(x, y, z) (x ^ y ^ z)
+#define I(x, y, z) (y ^ (x | ~z))
+
+#define STEP(i, f, a, b, c, d)                \
+    do {                                      \
+        a += f(b, c, d) + block[K(i)] + T(i); \
+        a = a << S(i) | a >> (32 - S(i));     \
+        a += b;                               \
+    } while (0)
+
+#define FF(i, ...) STEP((0x00 | i), F, __VA_ARGS__)
+#define GG(i, ...) STEP((0x10 | i), G, __VA_ARGS__)
+#define HH(i, ...) STEP((0x20 | i), H, __VA_ARGS__)
+#define II(i, ...) STEP((0x30 | i), I, __VA_ARGS__)
+
+#define MD5_UPDATE(OP)                                  \
+    OP(0x0, R1); OP(0x1, R2); OP(0x2, R3); OP(0x3, R4); \
+    OP(0x4, R1); OP(0x5, R2); OP(0x6, R3); OP(0x7, R4); \
+    OP(0x8, R1); OP(0x9, R2); OP(0xa, R3); OP(0xb, R4); \
+    OP(0xc, R1); OP(0xd, R2); OP(0xe, R3); OP(0xf, R4);
 
 static constexpr unsigned char Padding[64] { 0x80, /* 0x00, ... */ };
 
@@ -16,11 +46,14 @@ const void* MD5::UpdateImpl(const void *data, uint64_t len) {
     auto D = ctx_.D;
 
     while (block < limit) {
-        auto A_ = A;
-        auto B_ = B;
-        auto C_ = C;
-        auto D_ = D;
-        MD5_UPDATE
+        const auto A_ = A;
+        const auto B_ = B;
+        const auto C_ = C;
+        const auto D_ = D;
+        MD5_UPDATE(FF)
+        MD5_UPDATE(GG)
+        MD5_UPDATE(HH)
+        MD5_UPDATE(II)
         A += A_;
         B += B_;
         C += C_;
@@ -43,16 +76,16 @@ void MD5::FinalImpl(const void *data, uint64_t len) {
     }
 
     unsigned char buffer[128]; // 2 blocks
-    ::std::memcpy(buffer, data, len);
+    std::memcpy(buffer, data, len);
     const uint64_t total = (ctx_.size + len) << 3; // total number in bit
 
     if (len < 56) { // len -> [0, 56)
-        ::std::memcpy(buffer + len, Padding, 56 - len);
-        ::std::memcpy(buffer + 56, &total, 8);
+        std::memcpy(buffer + len, Padding, 56 - len);
+        std::memcpy(buffer + 56, &total, 8);
         UpdateImpl(buffer, 64); // update 1 block
     } else { // len -> [56, 64 + 56)
-        ::std::memcpy(buffer + len, Padding, 120 - len);
-        ::std::memcpy(buffer + 120, &total, 8);
+        std::memcpy(buffer + len, Padding, 120 - len);
+        std::memcpy(buffer + 120, &total, 8);
         UpdateImpl(buffer, 128); // update 2 blocks
     }
 }
