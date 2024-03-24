@@ -12,7 +12,7 @@ static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
 
 #include "impl/algorithm.inc"
 
-namespace md5 {
+namespace md5::impl {
 
 class MD5 {
 public:
@@ -58,7 +58,13 @@ private:
     void FinalImpl(const void *data, uint64_t len);
 };
 
-} // namespace md5
+} // namespace md5::impl
 
 #include "impl/inline.inc"
 #include "impl/constexpr.inc"
+
+namespace md5 {
+
+using MD5 = ::md5::impl::MD5;
+
+} // namespace md5

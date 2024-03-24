@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace md5 {
+namespace md5::impl {
 
 struct md5_ctx_ce {
     uint32_t A = MD5_A;
@@ -74,4 +74,4 @@ constexpr std::array<char, 32> MD5::HashCE(const char *data, uint64_t len) {
     return DigestCE({ctx.A, ctx.B, ctx.C, ctx.D});
 }
 
-} // namespace md5
+} // namespace md5::impl

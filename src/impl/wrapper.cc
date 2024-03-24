@@ -2,7 +2,7 @@
 
 #include "md5.h"
 
-namespace md5 {
+using ::md5::impl::MD5;
 
 std::string MD5::Digest() const {
     std::string result {};
@@ -39,5 +39,3 @@ MD5& MD5::Update(const void *data, uint64_t len) {
     }
     return *this;
 }
-
-} // namespace md5

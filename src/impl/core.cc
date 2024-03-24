@@ -2,7 +2,7 @@
 
 #include "md5.h"
 
-namespace md5 {
+using ::md5::impl::MD5;
 
 static constexpr unsigned char Padding[64] { 0x80, /* 0x00, ... */ };
 
@@ -43,18 +43,16 @@ void MD5::FinalImpl(const void *data, uint64_t len) {
     }
 
     unsigned char buffer[128]; // 2 blocks
-    std::memcpy(buffer, data, len);
+    ::std::memcpy(buffer, data, len);
     uint64_t total = (ctx_.size + len) << 3; // total number in bit
 
     if (len < 56) { // len -> [0, 56)
-        std::memcpy(buffer + len, Padding, 56 - len);
-        std::memcpy(buffer + 56, &total, 8);
+        ::std::memcpy(buffer + len, Padding, 56 - len);
+        ::std::memcpy(buffer + 56, &total, 8);
         UpdateImpl(buffer, 64); // update 1 block
     } else { // len -> [56, 64 + 56)
-        std::memcpy(buffer + len, Padding, 120 - len);
-        std::memcpy(buffer + 120, &total, 8);
+        ::std::memcpy(buffer + len, Padding, 120 - len);
+        ::std::memcpy(buffer + 120, &total, 8);
         UpdateImpl(buffer, 128); // update 2 blocks
     }
 }
-
-} // namespace md5

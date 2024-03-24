@@ -35,7 +35,7 @@
 
 #include "sine.inc"
 
-namespace md5 {
+namespace md5::impl {
 
 /// Hexadecimal character mapping table.
 constexpr char HexTable[] = {
@@ -77,8 +77,8 @@ consteval int S(int i) {
 
 /// MD5 T-table constant, input between 0 and 63.
 consteval uint32_t T(int i) {
-    auto val = math::sin(i + 1);
-    return static_cast<uint32_t>(std::abs(val) * 0x100000000);
+    auto val = ::md5::math::sin(i + 1);
+    return static_cast<uint32_t>(::std::abs(val) * 0x100000000);
 }
 
-} // namespace md5
+} // namespace md5::impl
