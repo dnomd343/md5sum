@@ -1,4 +1,5 @@
 #include "md5.h"
+#include "helper.h"
 #include "gtest/gtest.h"
 
 using md5::MD5;
@@ -262,14 +263,6 @@ const std::array<std::pair<uint8_t, std::string_view>, 256> test_items {{
     {0xff, "11b7aaa64c413d2f0fccf893881c46a2"},
 }};
 
-std::string build_test_data(uint8_t index) {
-    std::string data(index, 0x00);
-    for (uint8_t i = 0; i < index; ++i) {
-        data[i] = static_cast<char>(i);
-    }
-    return data;
-};
-
 TEST(md5sum, hash) {
     for (const auto &[index, expect] : test_items) {
         auto data = build_test_data(index);
@@ -279,13 +272,9 @@ TEST(md5sum, hash) {
 }
 
 TEST(md5sum, hash_ce) {
-    auto to_string = [](const std::array<char, 32> &digest) {
-        return std::string {digest.data(), 32};
-    };
-
     for (const auto &[index, expect] : test_items) {
         auto data = build_test_data(index);
-        EXPECT_EQ(to_string(MD5::HashCE(data)), expect);
-        EXPECT_EQ(to_string(MD5::HashCE(data.c_str(), index)), expect);
+        EXPECT_EQ(MD5::HashCE(data), expect);
+        EXPECT_EQ(MD5::HashCE(data.c_str(), index), expect);
     }
 }
