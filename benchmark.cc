@@ -1,34 +1,43 @@
-#include <benchmark/benchmark.h>
-
 #include "md5.h"
+#include "benchmark/benchmark.h"
 
-std::string test_data() {
-    char data[64];
-    for (char i = 0; i < 64; ++i) {
-        data[i] = i;
+using md5::MD5;
+
+std::string build_test_data() {
+    std::string data(65536, 0x00);
+    for (uint32_t i = 0; i < data.size(); ++i) {
+        data[i] = static_cast<char>(i & 0xff);
     }
-    return {data, data + 64};
-}
-
-static void MD5_Update(benchmark::State &state) {
-    const auto data = test_data();
-
-    md5::MD5 kk;
-
-    for (auto _ : state) {
-        kk.Update(data.c_str(), 64);
-    }
+    return data;
 }
 
 static void MD5_Digest(benchmark::State &state) {
-    md5::MD5 kk;
+    MD5 md5;
     for (auto _ : state) {
-        auto pp = kk.Digest();
+        auto volatile holder = md5.Digest();
     }
 }
 
-BENCHMARK(MD5_Update);
+static void MD5_Update(benchmark::State &state) {
+    MD5 md5;
+    const auto data = build_test_data();
+    for (auto _ : state) {
+        md5.Update(data.c_str(), state.range(0));
+    }
+}
+
+static void MD5_Hash(benchmark::State &state) {
+    const auto data = build_test_data();
+    for (auto _ : state) {
+        MD5::Hash(data.c_str(), state.range(0));
+    }
+}
 
 BENCHMARK(MD5_Digest);
+
+BENCHMARK(MD5_Update)->RangeMultiplier(4)->Range(64, 4096);
+
+BENCHMARK(MD5_Hash)->Arg(0);
+BENCHMARK(MD5_Hash)->RangeMultiplier(4)->Range(64, 4096);
 
 BENCHMARK_MAIN();
