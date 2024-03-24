@@ -35,13 +35,13 @@ constexpr double sin_core(double x) {
 
 /// Calculate the sin(x) value in radians.
 constexpr double sin(double x) {
-    x = std::fmod(x, 2 * PI); // -2PI < x < 2PI
+    x = ::std::fmod(x, 2 * PI); // -2PI < x < 2PI
 
-    if (std::abs(x) > PI) {
+    if (::std::abs(x) > PI) {
         x -= ((x > 0) ? 2 : -2) * PI; // -PI < x < PI
     }
 
-    if (std::abs(x) > PI / 2) {
+    if (::std::abs(x) > PI / 2) {
         x = ((x > 0) ? 1 : -1) * PI - x; // -PI / 2 < x < PI / 2
     }
     return sin_core(x); // closer to 0 for better accuracy
