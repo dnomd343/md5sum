@@ -4,7 +4,7 @@
 
 using md5::MD5;
 
-const std::array<std::pair<uint8_t, std::string_view>, 256> test_items {{
+constexpr std::array<std::pair<uint8_t, std::string_view>, 256> test_items {{
     {0x00, "d41d8cd98f00b204e9800998ecf8427e"},
     {0x01, "93b885adfe0da089cdf634904fd59f71"},
     {0x02, "441077cc9e57554dd476bdfb8b8b8102"},

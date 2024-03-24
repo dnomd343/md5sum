@@ -8,7 +8,7 @@ inline std::string build_test_data(const uint32_t size) {
         data[i] = static_cast<char>(i);
     }
     return data;
-};
+}
 
 namespace testing::internal {
 

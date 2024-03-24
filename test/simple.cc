@@ -5,7 +5,7 @@
 using md5::MD5;
 
 TEST(md5sum, empty) {
-    auto expect = "d41d8cd98f00b204e9800998ecf8427e";
+    constexpr auto expect = "d41d8cd98f00b204e9800998ecf8427e";
 
     EXPECT_EQ(MD5::Hash(""), expect);
     EXPECT_EQ(MD5::HashCE(""), expect);
@@ -18,7 +18,7 @@ TEST(md5sum, empty) {
 }
 
 TEST(md5sum, simple) {
-    auto expect = "5227827849ea5e9d942ff40dbbfaffd6";
+    constexpr auto expect = "5227827849ea5e9d942ff40dbbfaffd6";
 
     EXPECT_EQ(MD5::Hash("dnomd343"), expect);
     EXPECT_EQ(MD5::HashCE("dnomd343"), expect);
