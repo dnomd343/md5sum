@@ -1,10 +1,8 @@
 #pragma once
 
+#include <array>
 #include <string>
 #include <cstdint>
-
-// TODO: remove if not using tuple
-#include <tuple>
 
 static_assert(sizeof(uintptr_t) == 8,
     "Project only works on 64-bits architecture.");
@@ -15,9 +13,6 @@ static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
 #include "impl/algorithm.inc"
 
 namespace md5 {
-
-// TODO: return string or tuple result?
-using CE = std::tuple<uint32_t, uint32_t, uint32_t, uint32_t>;
 
 class MD5 {
 public:
@@ -46,11 +41,10 @@ public:
     static std::string Hash(const void *data, uint64_t len);
 
     /// Calculate the md5 hash value of the specified data with constexpr.
-    static constexpr CE HashCE(const std::string_view &data);
+    static constexpr std::array<char, 32> HashCE(const std::string_view &data);
 
     /// Calculate the md5 hash value of the specified data with constexpr.
-    // TODO: using `const void *` or `const char *`
-    static constexpr CE HashCE(const char *data, uint64_t len);
+    static constexpr std::array<char, 32> HashCE(const char *data, uint64_t len);
 
 private:
     md5_ctx ctx_;

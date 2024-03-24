@@ -31,7 +31,7 @@ inline std::string MD5::Hash(const void *data, uint64_t len) {
     return md5.Digest();
 }
 
-inline constexpr CE MD5::HashCE(const std::string_view &data) {
+constexpr std::array<char, 32> MD5::HashCE(const std::string_view &data) {
     return HashCE(data.data(), data.size());
 }
 

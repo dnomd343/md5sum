@@ -16,7 +16,7 @@ add_library(md5sum::md5sum ALIAS md5sum)
 
 if (MD5_ENABLE_TESTING)
     enable_testing()
-    add_executable(md5_test test/md5_update.cc)
+    add_executable(md5_test test/constexpr.cc test/md5_update.cc)
     target_link_libraries(md5_test PRIVATE md5sum::md5sum GTest::gtest_main)
 endif()
 
