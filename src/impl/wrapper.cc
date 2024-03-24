@@ -8,8 +8,8 @@ std::string MD5::Digest() const {
     std::string result(32, 0x00);
     auto *ptr = reinterpret_cast<const uint8_t *>(&ctx_);
     for (int i = 0; i < 32; ++ptr) {
-        result[i++] = HexTable[*ptr >> 4];
-        result[i++] = HexTable[*ptr & 0b1111];
+        result[i++] = value::HexTable[*ptr >> 4];
+        result[i++] = value::HexTable[*ptr & 0b1111];
     }
     return result;
 }
@@ -22,7 +22,7 @@ MD5& MD5::Update(const void *data, uint64_t len) {
             return *this; // save into buffer and return
         }
 
-        auto size = 64 - buffer_size_;
+        const auto size = 64 - buffer_size_;
         ::std::memcpy(buffer_ + buffer_size_, data, size);
         UpdateImpl(buffer_, 64); // fill and update with buffer
         data = static_cast<const char*>(data) + size;

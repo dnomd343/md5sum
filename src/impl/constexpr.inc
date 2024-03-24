@@ -1,26 +1,24 @@
 #pragma once
 
-#include <array>
-
 namespace md5::impl {
 
 struct md5_ctx_ce {
-    uint32_t A = MD5_A;
-    uint32_t B = MD5_B;
-    uint32_t C = MD5_C;
-    uint32_t D = MD5_D;
+    uint32_t A = value::kA;
+    uint32_t B = value::kB;
+    uint32_t C = value::kC;
+    uint32_t D = value::kD;
 
     const char *data;
     uint64_t data_len, padded_len;
 
-    constexpr md5_ctx_ce(const char *data, uint64_t len)
+    constexpr md5_ctx_ce(const char *data, const uint64_t len)
         : data(data), data_len(len), padded_len((len + 64 + 8) & ~0b111111ULL) {}
 };
 
 using Block = std::array<uint32_t, 16>; // single md5 block with 64 bytes
 
 /// Get the data and padding byte of the specified index.
-constexpr uint8_t GetByte(md5_ctx_ce *ctx, const uint64_t index) {
+constexpr uint8_t GetByte(const md5_ctx_ce *ctx, const uint64_t index) {
     if (index < ctx->data_len) // message data
         return ctx->data[index];
     if (index == ctx->data_len) // padding flag
@@ -32,10 +30,10 @@ constexpr uint8_t GetByte(md5_ctx_ce *ctx, const uint64_t index) {
 }
 
 /// Get the MD5 block content at the specified index.
-constexpr Block GetBlock(md5_ctx_ce *ctx, const uint64_t index) {
+constexpr Block GetBlock(const md5_ctx_ce *ctx, const uint64_t index) {
     Block block {};
     for (int i = 0; i < 16; ++i) {
-        auto offset = index + i * 4;
+        const auto offset = index + i * 4;
         (block[i] <<= 8) |= GetByte(ctx, offset + 3);
         (block[i] <<= 8) |= GetByte(ctx, offset + 2);
         (block[i] <<= 8) |= GetByte(ctx, offset + 1);
@@ -45,13 +43,13 @@ constexpr Block GetBlock(md5_ctx_ce *ctx, const uint64_t index) {
 }
 
 /// Convert origin MD5 integers to hexadecimal character array.
-constexpr std::array<char, 32> DigestCE(std::array<uint32_t, 4> ctx) {
+constexpr std::array<char, 32> DigestCE(const std::array<uint32_t, 4> &ctx) {
     std::array<char, 32> result {};
     for (uint32_t i = 0, val = 0; i < 32; val >>= 8) {
         if (!(i & 0b111))
             val = ctx[i >> 3];
-        result[i++] = HexTable[(val >> 4) & 0b1111];
-        result[i++] = HexTable[val & 0b1111];
+        result[i++] = value::HexTable[(val >> 4) & 0b1111];
+        result[i++] = value::HexTable[val & 0b1111];
     }
     return result;
 }
@@ -72,5 +70,7 @@ constexpr std::array<char, 32> MD5::HashCE(const char *data, uint64_t len) {
     }
     return DigestCE({ctx.A, ctx.B, ctx.C, ctx.D});
 }
+
+static_assert(MD5::HashCE("")[0] == 'd', "invalid constexpr");
 
 } // namespace md5::impl

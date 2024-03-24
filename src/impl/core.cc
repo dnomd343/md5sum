@@ -33,7 +33,7 @@ const void* MD5::UpdateImpl(const void *data, uint64_t len) {
     ctx_.C = C;
     ctx_.D = D;
     ctx_.size += len;
-    return static_cast<const void *>(limit);
+    return limit;
 }
 
 void MD5::FinalImpl(const void *data, uint64_t len) {
@@ -44,7 +44,7 @@ void MD5::FinalImpl(const void *data, uint64_t len) {
 
     unsigned char buffer[128]; // 2 blocks
     ::std::memcpy(buffer, data, len);
-    uint64_t total = (ctx_.size + len) << 3; // total number in bit
+    const uint64_t total = (ctx_.size + len) << 3; // total number in bit
 
     if (len < 56) { // len -> [0, 56)
         ::std::memcpy(buffer + len, Padding, 56 - len);

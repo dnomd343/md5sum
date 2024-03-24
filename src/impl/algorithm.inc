@@ -33,27 +33,15 @@
 #define MD5_UPDATE \
     MD5_ROUND(MD5_FF) MD5_ROUND(MD5_GG) MD5_ROUND(MD5_HH) MD5_ROUND(MD5_II)
 
-#include "sine.inc"
+#include "value.inc"
 
 namespace md5::impl {
 
-/// Hexadecimal character mapping table.
-constexpr char HexTable[] = {
-    '0','1','2','3','4','5','6','7',
-    '8','9','a','b','c','d','e','f',
-};
-
-/// MD5 fixed constants in little endian.
-constexpr uint32_t MD5_A = 0x67452301;
-constexpr uint32_t MD5_B = 0xefcdab89;
-constexpr uint32_t MD5_C = 0x98badcfe;
-constexpr uint32_t MD5_D = 0x10325476;
-
 struct md5_ctx {
-    uint32_t A = MD5_A;
-    uint32_t B = MD5_B;
-    uint32_t C = MD5_C;
-    uint32_t D = MD5_D;
+    uint32_t A = value::kA;
+    uint32_t B = value::kB;
+    uint32_t C = value::kC;
+    uint32_t D = value::kD;
     uint64_t size = 0; // processed size in byte
 };
 
@@ -77,8 +65,11 @@ constexpr int S(const int i) {
 
 /// MD5 T-table constant, input between 0 and 63.
 constexpr uint32_t T(const int i) {
-    const auto val = ::md5::math::sin(i + 1);
-    return static_cast<uint32_t>(::md5::math::abs(val) * 0x100000000);
+    return value::kT[i];
 }
+
+static_assert(K(0) != K(63), "invalid constexpr");
+static_assert(S(0) != S(63), "invalid constexpr");
+static_assert(T(0) != T(63), "invalid constexpr");
 
 } // namespace md5::impl
