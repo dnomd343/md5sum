@@ -1,12 +1,6 @@
 #include <cstring>
 
 #include "md5.h"
-#include "sine.inc"
-#include "algorithm.inc"
-
-#define MD5_S(i)    value::S(i)
-#define MD5_T(i)    value::T(i)
-#define MD5_DATA(i) block[value::K(i)]
 
 namespace md5 {
 

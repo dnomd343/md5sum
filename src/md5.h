@@ -3,13 +3,21 @@
 #include <string>
 #include <cstdint>
 
+// TODO: remove if not using tuple
+#include <tuple>
+
 static_assert(sizeof(uintptr_t) == 8,
     "Project only works on 64-bits architecture.");
 
 static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
     "Project only works on little-endian architecture.");
 
+#include "impl/algorithm.inc"
+
 namespace md5 {
+
+// TODO: return string or tuple result?
+using CE = std::tuple<uint32_t, uint32_t, uint32_t, uint32_t>;
 
 class MD5 {
 public:
@@ -37,19 +45,12 @@ public:
     /// Calculate the md5 hash value of the specified data.
     static std::string Hash(const void *data, uint64_t len);
 
-private:
-    static constexpr uint32_t MD5_A = 0x67452301;
-    static constexpr uint32_t MD5_B = 0xefcdab89;
-    static constexpr uint32_t MD5_C = 0x98badcfe;
-    static constexpr uint32_t MD5_D = 0x10325476;
+    /// Calculate the md5 hash value of the specified data with constexpr.
+    static constexpr CE HashCE(const std::string_view &data);
 
-    struct md5_ctx {
-        uint32_t A = MD5_A;
-        uint32_t B = MD5_B;
-        uint32_t C = MD5_C;
-        uint32_t D = MD5_D;
-        uint64_t size = 0; // processed size in byte
-    };
+    /// Calculate the md5 hash value of the specified data with constexpr.
+    // TODO: using `const void *` or `const char *`
+    static constexpr CE HashCE(const char *data, uint64_t len);
 
 private:
     md5_ctx ctx_;
@@ -66,3 +67,4 @@ private:
 } // namespace md5
 
 #include "impl/inline.inc"
+#include "impl/constexpr.inc"

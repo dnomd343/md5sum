@@ -12,11 +12,11 @@
 
 #define MD5_CYC(w, s) (w = (w << s) | (w >> (32 - s)))
 
-#define MD5_STEP(i, f, a, b, c, d)                \
-    do {                                          \
-        a += f(b, c, d) + MD5_DATA(i) + MD5_T(i); \
-        MD5_CYC(a, MD5_S(i));                     \
-        a += b;                                   \
+#define MD5_STEP(i, f, a, b, c, d)            \
+    do {                                      \
+        a += f(b, c, d) + block[K(i)] + T(i); \
+        MD5_CYC(a, S(i));                     \
+        a += b;                               \
     } while (0)
 
 #define MD5_FF(i, ...) MD5_STEP((0x00 | i), MD5_F, __VA_ARGS__)
@@ -33,18 +33,34 @@
 #define MD5_UPDATE \
     MD5_ROUND(MD5_FF) MD5_ROUND(MD5_GG) MD5_ROUND(MD5_HH) MD5_ROUND(MD5_II)
 
-namespace md5::value {
+#include "sine.inc"
+
+namespace md5 {
+
+/// MD5 fixed constants in little endian.
+constexpr uint32_t MD5_A = 0x67452301;
+constexpr uint32_t MD5_B = 0xefcdab89;
+constexpr uint32_t MD5_C = 0x98badcfe;
+constexpr uint32_t MD5_D = 0x10325476;
+
+struct md5_ctx {
+    uint32_t A = MD5_A;
+    uint32_t B = MD5_B;
+    uint32_t C = MD5_C;
+    uint32_t D = MD5_D;
+    uint64_t size = 0; // processed size in byte
+};
 
 /// MD5 data block index, input between 0 and 63.
 consteval int K(int i) {
-    const int step[] = {1, 5, 3, 7};
-    const int begin[] = {0, 1, 5, 0};
+    const int step[4] = {1, 5, 3, 7};
+    const int begin[4] = {0, 1, 5, 0};
     return (begin[i >> 4] + step[i >> 4] * i) & 0b1111;
 }
 
 /// MD5 circular shift times, input between 0 and 63.
 consteval int S(int i) {
-    const int shift[][4] = {
+    const int shift[4][4] = {
         {7, 12, 17, 22},
         {5, 9, 14, 20},
         {4, 11, 16, 23},
@@ -59,4 +75,4 @@ consteval uint32_t T(int i) {
     return static_cast<uint32_t>(std::abs(val) * 0x100000000);
 }
 
-} // namespace md5::value
+} // namespace md5
