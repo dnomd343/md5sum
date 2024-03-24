@@ -10,6 +10,8 @@ static_assert(sizeof(uintptr_t) == 8,
 static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
     "Project only works on little-endian architecture.");
 
+#define MD5_EXPORT __attribute__ ((visibility ("default")))
+
 #include "impl/value.inc"
 #include "impl/constexpr.inc"
 
@@ -26,13 +28,13 @@ public:
     MD5& Update(const std::string_view &data);
 
     /// Update md5 hash with specified data.
-    MD5& Update(const void *data, uint64_t len);
+    MD5_EXPORT MD5& Update(const void *data, uint64_t len);
 
     /// Stop streaming updates and calculate result.
     MD5& Final();
 
     /// Get the string result of md5.
-    [[nodiscard]] std::string Digest() const;
+    [[nodiscard]] MD5_EXPORT std::string Digest() const;
 
     /// Calculate the md5 hash value of the specified data.
     static std::string Hash(const std::string_view &data);
@@ -63,7 +65,7 @@ private:
     const void* UpdateImpl(const void *data, uint64_t len);
 
     /// Update and final the md5 hash with the specified data.
-    void FinalImpl(const void *data, uint64_t len);
+    MD5_EXPORT void FinalImpl(const void *data, uint64_t len);
 };
 
 } // namespace md5
