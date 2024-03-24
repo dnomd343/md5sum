@@ -4,8 +4,9 @@ project(md5sum LANGUAGES CXX)
 # ------------------------------------------------------------------------------------ #
 
 option(MD5_SHARED_LIB "Built as a dynamic library." OFF)
-option(MD5_ENABLE_TESTING "Enable testing of the md5sum library." ON)
-option(MD5_ENABLE_BENCHMARK "Enable benchmark of the md5sum library." ON)
+option(MD5_ENABLE_LTO "Enable LTO optimization of the library." ON)
+option(MD5_ENABLE_TESTING "Enable testing of the md5sum library." OFF)
+option(MD5_ENABLE_BENCHMARK "Enable benchmark of the md5sum library." OFF)
 
 # ------------------------------------------------------------------------------------ #
 
@@ -30,7 +31,11 @@ set(CMAKE_CXX_STANDARD ${MD5_CXX_STANDARD})
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)  # using release build in default
 endif()
-add_compile_options(-Wall -Wextra)
+
+add_compile_options(-Wall -Wextra -Werror)
+if (MD5_ENABLE_LTO)
+    add_compile_options(-flto=auto)
+endif()
 
 file(GLOB MD5_SRC src/impl/*.cc)
 if (NOT MD5_SHARED_LIB)
@@ -41,7 +46,7 @@ else()
 endif()
 target_include_directories(md5sum PUBLIC src/)
 
-set(MD5_COMPILE_OPTIONS -fno-rtti -fno-exceptions -pedantic)
+set(MD5_COMPILE_OPTIONS -fno-rtti -fno-exceptions)
 target_compile_options(md5sum PRIVATE ${MD5_COMPILE_OPTIONS})
 
 add_library(md5sum::md5sum ALIAS md5sum)
@@ -61,7 +66,7 @@ endif()
 if (MD5_ENABLE_BENCHMARK)
     add_executable(md5_benchmark benchmark.cc)
     target_link_libraries(md5_benchmark PRIVATE md5sum benchmark::benchmark_main)
-    target_compile_options(md5_benchmark PRIVATE -fno-rtti -fno-exceptions)
+    target_compile_options(md5_benchmark PRIVATE ${MD5_COMPILE_OPTIONS})
 endif()
 
 # ------------------------------------------------------------------------------------ #
