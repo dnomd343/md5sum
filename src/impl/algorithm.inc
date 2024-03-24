@@ -58,14 +58,14 @@ struct md5_ctx {
 };
 
 /// MD5 data block index, input between 0 and 63.
-consteval int K(int i) {
+constexpr int K(int i) {
     const int step[4] = {1, 5, 3, 7};
     const int begin[4] = {0, 1, 5, 0};
     return (begin[i >> 4] + step[i >> 4] * i) & 0b1111;
 }
 
 /// MD5 circular shift times, input between 0 and 63.
-consteval int S(int i) {
+constexpr int S(int i) {
     const int shift[4][4] = {
         {7, 12, 17, 22},
         {5, 9, 14, 20},
@@ -76,7 +76,7 @@ consteval int S(int i) {
 }
 
 /// MD5 T-table constant, input between 0 and 63.
-consteval uint32_t T(int i) {
+constexpr uint32_t T(int i) {
     auto val = ::md5::math::sin(i + 1);
     return static_cast<uint32_t>(::std::abs(val) * 0x100000000);
 }

@@ -4,7 +4,21 @@ project(md5sum LANGUAGES CXX)
 option(MD5_ENABLE_TESTING "Enable testing of the md5sum library." ON)
 option(MD5_ENABLE_BENCHMARK "Enable benchmark of the md5sum library." ON)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CXX_STANDARDS)
+foreach (CXX_FEATURE ${CMAKE_CXX_COMPILE_FEATURES})
+    if (CXX_FEATURE MATCHES "^cxx_std_[0-9]+$")
+        string(REGEX MATCH "[0-9]+$" CXX_STANDARD ${CXX_FEATURE})
+        list(APPEND CXX_STANDARDS ${CXX_STANDARD})  # Get supported c++ standards
+    endif()
+endforeach()
+
+if (NOT 17 IN_LIST CXX_STANDARDS)
+    message(FATAL_ERROR "MD5 projects require at least C++17 support.")
+endif()
+
+list(GET CXX_STANDARDS -1 MD5_CXX_STANDARD)  # Select the latest C++ standard
+message("MD5 CXX STANDARD: ${MD5_CXX_STANDARD}")
+set(CMAKE_CXX_STANDARD ${MD5_CXX_STANDARD})
 add_compile_options(-Wall -Wextra)
 
 add_library(md5sum STATIC src/impl/core.cc src/impl/wrapper.cc)

@@ -6,7 +6,7 @@ namespace md5::math {
 
 constexpr double PI = 3.14159265358979323846264338327950;
 
-consteval double pow(double x, int n) {
+constexpr double pow(double x, int n) {
     double res = 1;
     for (int i = 0; i < n; ++i) {
         res *= x;
@@ -14,7 +14,7 @@ consteval double pow(double x, int n) {
     return res;
 }
 
-consteval double factorial(int n) {
+constexpr double factorial(int n) {
     double res = 1;
     for (int i = 2 ; i <= n ; ++i) {
         res *= i;
@@ -23,7 +23,7 @@ consteval double factorial(int n) {
 }
 
 /// Calculate sin(x) value with Maclaurin series.
-consteval double sin_core(double x) {
+constexpr double sin_core(double x) {
     double res = x;
     for (int i = 1; i < 80; ++i) {
         const int n = i * 2 + 1;
@@ -34,7 +34,7 @@ consteval double sin_core(double x) {
 }
 
 /// Calculate the sin(x) value in radians.
-consteval double sin(double x) {
+constexpr double sin(double x) {
     x = std::fmod(x, 2 * PI); // -2PI < x < 2PI
 
     if (std::abs(x) > PI) {

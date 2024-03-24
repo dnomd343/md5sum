@@ -13,9 +13,8 @@ struct md5_ctx_ce {
     const char *data;
     uint64_t data_len, padded_len;
 
-    constexpr md5_ctx_ce(const char *ptr, uint64_t len) : data(ptr), data_len(len) {
-        padded_len = (data_len + 64 + 8) & ~0b111111ULL;
-    }
+    constexpr md5_ctx_ce(const char *data, uint64_t len)
+        : data(data), data_len(len), padded_len((len + 64 + 8) & ~0b111111ULL) {}
 };
 
 using Block = std::array<uint32_t, 16>; // single md5 block with 64 bytes
@@ -48,7 +47,7 @@ constexpr Block GetBlock(md5_ctx_ce *ctx, const uint64_t index) {
 /// Convert origin MD5 integers to hexadecimal character array.
 constexpr std::array<char, 32> DigestCE(std::array<uint32_t, 4> ctx) {
     std::array<char, 32> result {};
-    for (uint32_t i = 0, val; i < 32; val >>= 8) {
+    for (uint32_t i = 0, val = 0; i < 32; val >>= 8) {
         if (!(i & 0b111))
             val = ctx[i >> 3];
         result[i++] = HexTable[(val >> 4) & 0b1111];
