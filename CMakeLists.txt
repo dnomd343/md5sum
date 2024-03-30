@@ -1,5 +1,9 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 project(md5sum LANGUAGES CXX)
+
+if ("${CMAKE_VERSION}" VERSION_GREATER_EQUAL "3.13")
+    cmake_policy(SET CMP0077 NEW)
+endif()
 
 # ------------------------------------------------------------------------------------ #
 
@@ -49,7 +53,8 @@ endif()
 set(MD5_COMPILE_OPTIONS -fno-rtti -fno-exceptions)
 target_compile_options(md5sum PRIVATE ${MD5_COMPILE_OPTIONS})
 target_include_directories(md5sum PUBLIC src/)
-add_library(md5sum::md5sum ALIAS md5sum)
+
+add_library(md5sum::md5 ALIAS md5sum)
 
 # ------------------------------------------------------------------------------------ #
 
