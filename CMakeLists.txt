@@ -3,7 +3,8 @@ project(md5sum LANGUAGES CXX)
 
 # ------------------------------------------------------------------------------------ #
 
-option(MD5_SHARED_LIB "Built as a dynamic library." OFF)
+option(MD5_BUILD_DEMO "Build md5 demo binary." OFF)
+option(MD5_SHARED_LIB "Build as a dynamic library." OFF)
 option(MD5_ENABLE_LTO "Enable LTO optimization of the library." ON)
 option(MD5_ENABLE_TESTING "Enable testing of the md5sum library." OFF)
 option(MD5_ENABLE_BENCHMARK "Enable benchmark of the md5sum library." OFF)
@@ -44,12 +45,19 @@ else()
     add_library(md5sum SHARED ${MD5_SRC})
     target_compile_options(md5sum PRIVATE -fvisibility=hidden)
 endif()
-target_include_directories(md5sum PUBLIC src/)
 
 set(MD5_COMPILE_OPTIONS -fno-rtti -fno-exceptions)
 target_compile_options(md5sum PRIVATE ${MD5_COMPILE_OPTIONS})
-
+target_include_directories(md5sum PUBLIC src/)
 add_library(md5sum::md5sum ALIAS md5sum)
+
+# ------------------------------------------------------------------------------------ #
+
+if (MD5_BUILD_DEMO)
+    add_executable(md5_demo demo.cc)
+    target_link_libraries(md5_demo PRIVATE md5sum)
+    target_compile_options(md5_demo PRIVATE ${MD5_COMPILE_OPTIONS})
+endif()
 
 # ------------------------------------------------------------------------------------ #
 
