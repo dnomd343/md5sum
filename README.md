@@ -1,27 +1,25 @@
 # MD5
 
-+ 纯 C++ 接口及实现。
++ ✔︎ 纯 C++ 接口及实现。
 
-+ 计算性能比 coreutils 更高。
++ ✔︎ 计算性能比 coreutils 更高。
 
-+ 基于编译期计算，完整实现 MD5 算法。
++ ✔︎ 基于编译期计算，完整实现 MD5 算法。
 
-+ 完善的单元测试及性能基准套件。
++ ✔︎ 完善的单元测试及性能基准套件。
 
-+ 支持编译期 MD5 哈希值计算。
-
-> 这个项目更适合作为学习现代 C++ 或是密码学的工具，在正式的生产环境中，我建议使用 openssl 库。
++ ✔︎ 支持编译期 MD5 哈希值计算。
 
 ## 快速开始
 
-您需要在项目中引入本仓库，例如以下命令：
+首先，您需要在项目中引入本仓库：
 
 ```bash
 > mkdir my_project && cd ./my_project/
 > git clone https://github.com/dnomd343/md5sum.git
 ```
 
-此时，编写一份源代码用于调用，例如 `main.cc` 文件：
+编写一份源代码用于测试，例如 `main.cc` 文件：
 
 ```c++
 #include "md5.h"
@@ -34,50 +32,58 @@ int main() {
 }
 ```
 
-同时，你需要一份 CMake 配置来驱动它，创建 `CMakeLists.txt` 文件：
+同时，您需要一份 CMake 配置来驱动它，创建 `CMakeLists.txt` 文件：
 
 ```cmake
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 project(my_project LANGUAGES CXX)
 
 add_subdirectory(md5sum)
 
 add_executable(my_demo main.cc)
-target_link_libraries(my_demo PRIVATE md5sum::md5sum)
+target_link_libraries(my_demo PRIVATE md5sum::md5)
 ```
 
-这时，我们只需要将剩下的工作交给编译器，执行以下命令：
+最后，我们将剩下的工作交给编译器，执行以下命令：
 
 ```bash
-> cmake -Bcmake-build
-> cmake --build cmake-build
+> cmake -Bcmake-build && cmake --build cmake-build
 > ./cmake-build/my_demo
 5eb63bbbe01eeed093cb22bb8f5acdc3
 ```
 
 ## 哈希接口
 
-所有的哈希计算接口都集中在 `MD5` 这个类中，它分为两种：直接计算和流式更新，前者是一元调用，传入数据并得到哈希结果，后者允许您多次将数据传入并不断更新哈希值，并最终得到结果，这在计算大文件哈希时特别有用。
+所有的哈希计算接口都集中在 `MD5` 这个类中，它分为两种：直接计算和流式更新。前者是一元调用，传入数据并得到哈希结果，后者允许您多次将数据传入并不断更新哈希值，并最终得到结果，这在计算大文件哈希时特别有用。
 
-以下接口可以直接计算，返回字符串形式的哈希结果：
+以下接口用于直接计算，返回字符串形式的哈希结果：
 
 ```c++
+// Calculate the md5 hash value of the specified data.
 static std::string Hash(const std::string_view &data);
 static std::string Hash(const void *data, uint64_t len);
 ```
 
-以下接口允许流式计算哈希值，使用 `Update` 接口传入数据，调用 `Final` 接口终止计算，并通过 `Digest` 接口得到字符串形式的哈希结果。
+以下接口允许流式计算哈希值，使用 `Update` 接口传入数据，调用 `Final` 接口完成计算，并通过 `Digest` 接口得到字符串形式的哈希结果，最后，您可能需要调用 `Reset` 为下一轮计算初始化：
+
+> 返回值 `MD5&` 是类自身的引用，它使得链式调用场景更为方便。
 
 ```c++
+// Update md5 hash with specified data.
 MD5& Update(const std::string_view &data);
 MD5& Update(const void *data, uint64_t len);
 
+// Stop streaming updates and calculate result.
 MD5& Final();
+
+// Get the string result of md5.
 std::string Digest() const;
+
+// Reset for next round of hashing.
 MD5& Reset();
 ```
 
-请注意，在调用 `Final` 后不再应该使用 `Update` 接口，在进行下一轮计算时，请务必调用 `Reset` 接口，否则将得到错误的结果，以下是一个简单的示例：
+请注意，在调用 `Final` 后不再应该使用 `Update` 接口，在进行下一轮计算前，请务必调用 `Reset` 接口，否则将得到错误的结果。以下是一个简单的示例：
 
 ```c++
 #include "md5.h"
@@ -92,28 +98,29 @@ int main() {
         .Update(" ")
         .Update("world")
         .Final();
-    std::cout << hash.Digest() << std::endl;
+    std::cout << hash.Digest() << std::endl; // 5eb63bbbe01eeed093cb22bb8f5acdc3
 
     hash.Reset();
     hash.Update("hello world").Final();
-    std::cout << hash.Digest() << std::endl;
+    std::cout << hash.Digest() << std::endl; // 5eb63bbbe01eeed093cb22bb8f5acdc3
 
-    std::cout << MD5::Hash("hello world") << std::endl;
+    std::cout << MD5::Hash("hello world") << std::endl; // 5eb63bbbe01eeed093cb22bb8f5acdc3
 }
 ```
 
 ## 编译期哈希
 
-这是一个很有趣的特性，C++ 允许我们在编译的时候进行一些常量表达式计算，你可以直接将常量二进制数据传入，并得到它的 MD5 常量值。
+这是一个很有趣的特性，C++ 允许我们在编译的时候进行一些常量表达式计算，您可以直接将常量二进制数据传入，并得到它的 MD5 常量值。
 
-不过由于编译器限制，在当前并不支持构建 `std::string` 作为返回值，相应的，它返回 `std::array<char, 32>` 作为结果，函数原型如下。
+不过由于编译器限制，在当前并不支持构造 `std::string` 作为常量表达式，作为替代，它返回 `std::array<char, 32>` 类型的结果，函数原型如下：
 
 ```c++
+// Calculate the md5 hash value of the specified data with constexpr.
 static constexpr std::array<char, 32> HashCE(const std::string_view &data);
 static constexpr std::array<char, 32> HashCE(const char *data, uint64_t len);
 ```
 
-下面是一个例子：
+使用常量表达式意味着，哈希过程将在编译期进行，MD5 结果将作为常量记录到编译产物中。下面是一个例子：
 
 ```c++
 #include "md5.h"
@@ -123,7 +130,7 @@ using md5::MD5;
 
 int main() {
     constexpr auto my_hash = MD5::HashCE("hello world");
-    std::cout << std::string { my_hash.data(), 32 } << std::endl;
+    std::cout << std::string { my_hash.data(), 32 } << std::endl; // 5eb63bbbe01eeed093cb22bb8f5acdc3
 }
 ```
 
@@ -198,18 +205,20 @@ MD5_Hash/1024         1358 ns         1358 ns       515488
 MD5_Hash/4096         5137 ns         5133 ns       136354
 ```
 
-这些数据意味着，在 i3-1115G4 这颗 CPU 上，导出一次 MD5 结果需要约 10 纳秒，完成 64 字节的更新需要 78.6 纳秒，完成 4 KiB 的哈希计算需要 5.133 微秒。
+这些数据意味着，在这颗 CPU 上，导出一次 MD5 字符串需要约 10 纳秒，完成 64 字节的更新需要 78.6 纳秒，完成 4 KiB 的哈希计算需要 5.133 微秒。
+
+哈希速度与 CPU 的单核性能有直接关系，绝大多数场景下，性能瓶颈在于 CPU 而非 IO 部分。如果您需要校验大量数据，xxHash 或者 BLAKE3 将会是更合适的选择。
 
 ## 二进制示例
 
-在本项目中，同时提供了一个演示样例，它可以实现对文件的 MD5 值计算，你需要使用以下命令编译：
+本项目同时提供了一个演示样例，它可以实现对文件的 MD5 值计算，您需要使用以下命令编译：
 
 ```bash
 > cmake -DMD5_BUILD_DEMO=ON -Bcmake-build
 > cmake --build cmake-build
 ```
 
-生成一个 8GiB 的空文件用于测试。
+生成一个 8GiB 的空文件用于测试：
 
 ```bash
 > dd if=/dev/zero of=test.dat bs=1GiB count=8
@@ -254,19 +263,21 @@ sys     0m1.252s
 
 + `MD5_SHARED_LIB` ：是否构建为动态库，默认关闭
 
-+ `MD5_ENABLE_LTO` ：是否开启LTO优化，默认打开
++ `MD5_ENABLE_LTO` ：是否开启 LTO 优化，默认打开
 
 + `MD5_ENABLE_TESTING` ：是否构建项目单元测试，默认关闭
 
 + `MD5_ENABLE_BENCHMARK` ：是否构建性能基准套件，默认关闭
 
-注意，如果您使用 clang 编译器和 ld 链接器，由于 GNU LD 并不认识 LLVM 字节码，需要关闭 LTO 选项才能正常链接，或者您可以增加 `-fuse-ld=lld` 选项切换到 LLVM LLD 链接器。
+> 注意：如果您使用 Clang 编译器和 ld 链接器，由于 GNU 工具并不认识 LLVM 字节码，需要关闭 LTO 才能正常链接，或者您可以增加 `-fuse-ld=lld` 选项切换到 lld 链接器。普遍情况下，Linux 用户并不建议使用 Clang 编译本项目，在当前的性能基准下，如果未开启 `-march=native` 优化，在 Clang18 与 g++12 的对比中，它通常会落后 20% 左右。
 
-普遍情况下，Linux 用户并不建议使用 clang 编译，在本项目的性能基准下，它通常会落后 20% 左右（clang18 vs g++12）。
+此外，在构建为动态库时，项目内部的符号将被隐藏，这意味着 strip 以后，仅有以下符号暴露：
 
-此外，在构建为动态库时，项目内部的符号将被隐藏，在 strip 以后，仅有以下符号暴露（其中 `FinalImpl` 在头文件内联）：
+> 由于部分哈希接口在头文件内联实现，因此 `FinalImpl` 符号将对外暴露。
 
 ```bash
+> cmake -DMD5_SHARED_LIB=ON -Bcmake-build
+> cmake --build cmake-build
 > nm -CD ./cmake-build/libmd5sum.so
                  w __cxa_finalize@GLIBC_2.2.5
                  w __gmon_start__
