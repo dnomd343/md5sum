@@ -12,14 +12,16 @@ std::string build_test_data() {
 }
 
 static void MD5_Digest(benchmark::State &state) {
-    for (constexpr MD5 md5; auto _ : state) {
+    constexpr MD5 md5;
+    for (auto _ : state) {
         auto volatile holder = md5.Digest();
     }
 }
 
 static void MD5_Update(benchmark::State &state) {
+    MD5 md5;
     const auto data = build_test_data();
-    for (MD5 md5; auto _ : state) {
+    for (auto _ : state) {
         md5.Update(data.c_str(), state.range(0));
     }
 }
