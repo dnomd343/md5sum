@@ -1,27 +1,25 @@
 # MD5
 
-+ ✔︎ Pure C++ interface and implementation.
++ ✔︎ 纯 C++ 接口及实现。
 
-+ ✔︎ Computational performance is higher than coreutils.
++ ✔︎ 计算性能比 coreutils 更高。
 
-+ ✔︎ Implement complete algorithms based on constant expressions.
++ ✔︎ 基于常量表达式实现完整的算法。
 
-+ ✔︎ Complete unit testing and performance benchmark suite.
++ ✔︎ 完善的单元测试及性能基准套件。
 
-+ ✔︎ Supports compile-time MD5 hash calculation.
++ ✔︎ 支持编译期 MD5 哈希值计算。
 
-[简体中文](./README_zh-CN.md)
+## 快速开始
 
-## Quick Start
-
-First, you need to introduce this repository into your project:
+首先，您需要在项目中引入本仓库：
 
 ```bash
 > mkdir my_project && cd ./my_project/
 > git clone https://github.com/dnomd343/md5sum.git
 ```
 
-Create a source code for testing, such as the `main.cc` file:
+编写一份源代码用于测试，例如 `main.cc` 文件：
 
 ```c++
 #include "md5.h"
@@ -34,7 +32,7 @@ int main() {
 }
 ```
 
-Next, you need a CMake configuration, create the `CMakeLists.txt` file:
+同时，您需要一份 CMake 配置来驱动它，创建 `CMakeLists.txt` 文件：
 
 ```cmake
 cmake_minimum_required(VERSION 3.10)
@@ -46,7 +44,7 @@ add_executable(my_demo main.cc)
 target_link_libraries(my_demo PRIVATE md5sum::md5)
 ```
 
-Finally, we leave the remaining work to the compiler and execute the following command:
+最后，我们将剩下的工作交给编译器，执行以下命令：
 
 ```bash
 > cmake -Bcmake-build && cmake --build cmake-build
@@ -54,11 +52,11 @@ Finally, we leave the remaining work to the compiler and execute the following c
 5eb63bbbe01eeed093cb22bb8f5acdc3
 ```
 
-## Hash Functions
+## 哈希接口
 
-All hash calculation interfaces are concentrated in the `MD5` class, which is divided into two types: direct calculation and streaming update. The former is a unary call, passing in data and getting the hash result, while the latter allows you to pass in the data multiple times and constantly update the hash value, and finally get the result, which is especially useful when calculating hash of large file.
+所有的哈希计算接口都集中在 `MD5` 这个类中，它分为两种：直接计算和流式更新。前者是一元调用，传入数据并得到哈希结果，后者允许您多次将数据传入并不断更新哈希值，并最终得到结果，这在计算大文件哈希时特别有用。
 
-The following interfaces are used for direct calculation and returns the hash result in string form:
+以下接口用于直接计算，返回字符串形式的哈希结果：
 
 ```c++
 // Calculate the md5 hash value of the specified data.
@@ -66,9 +64,9 @@ static std::string Hash(const std::string_view &data);
 static std::string Hash(const void *data, uint64_t len);
 ```
 
-The following interfaces allow streaming calculation of hash values. Use the `Update` interface to pass in data, call the `Final` interface to complete the calculation, and get the hash result in string form through the `Digest` interface. Finally, you may need to call `Reset` for the next round of calculation:
+以下接口允许流式计算哈希值，使用 `Update` 接口传入数据，调用 `Final` 接口完成计算，并通过 `Digest` 接口得到字符串形式的哈希结果，最后，您可能需要调用 `Reset` 为下一轮计算初始化：
 
-> The return value `MD5&` is a reference to the class itself, which makes chain calling scenarios more convenient.
+> 返回值 `MD5&` 是类自身的引用，它使得链式调用场景更为方便。
 
 ```c++
 // Update md5 hash with specified data.
@@ -85,7 +83,7 @@ std::string Digest() const;
 MD5& Reset();
 ```
 
-Please note that the `Update` interface should no longer be used after calling `Final`. Before the next round of calculation, be sure to call the `Reset` interface, otherwise you will get incorrect results. Here's a simple example:
+请注意，在调用 `Final` 后不再应该使用 `Update` 接口，在进行下一轮计算前，请务必调用 `Reset` 接口，否则将得到错误的结果。以下是一个简单的示例：
 
 ```c++
 #include "md5.h"
@@ -110,11 +108,11 @@ int main() {
 }
 ```
 
-## Compile-time Hash
+## 编译期哈希
 
-This is a very interesting feature. C++ allows us to perform some constant expression calculations during compilation. You can directly pass in constant binary data and get its MD5 constant value.
+这是一个很有趣的特性，C++ 允许我们在编译的时候进行一些常量表达式计算，您可以直接将常量二进制数据传入，并得到它的 MD5 常量值。
 
-However, due to compiler limitations, constructing `std::string` as a constant expression is currently not supported. Instead, it returns a result of type `std::array<char, 32>` . The function prototypes are as follows:
+不过由于编译器限制，在当前并不支持构造 `std::string` 作为常量表达式，作为替代，它返回 `std::array<char, 32>` 类型的结果，函数原型如下：
 
 ```c++
 // Calculate the md5 hash value of the specified data with constexpr.
@@ -122,7 +120,7 @@ static constexpr std::array<char, 32> HashCE(const std::string_view &data);
 static constexpr std::array<char, 32> HashCE(const char *data, uint64_t len);
 ```
 
-Using constant expressions means that the hashing process will be performed at compile-time and the MD5 result will be recorded as a constant in the compilation product. Below is an example:
+使用常量表达式意味着，哈希过程将在编译期进行，MD5 结果将作为常量记录到编译产物中。下面是一个例子：
 
 ```c++
 #include "md5.h"
@@ -136,9 +134,9 @@ int main() {
 }
 ```
 
-## Unit-Test and Benchmark
+## 测试与基准
 
-For a robust project, unit tests and performance benchmarks are necessary, and `md5sum` also provides these. Before we begin, we need to clone these third-party library codes:
+对于一个鲁棒的项目，单元测试和性能基准是很有必要的，`md5sum` 同样提供了这些。在开始之前，我们需要先克隆这些第三方库代码：
 
 ```bash
 > cd ./md5sum/
@@ -148,14 +146,14 @@ Submodule 'third_party/googletest' (https://github.com/google/googletest.git) re
 ···
 ```
 
-Then, execute the following commands to compile:
+然后，执行以下命令进行编译：
 
 ```bash
 > cmake -DMD5_ENABLE_TESTING=ON -DMD5_ENABLE_BENCHMARK=ON -Bcmake-build
 > cmake --build cmake-build
 ```
 
-Let's execute the unit tests:
+让我们执行单元测试：
 
 ```bash
 > ./cmake-build/md5_test
@@ -180,7 +178,7 @@ Running main() from ···
 [  PASSED  ] 5 tests.
 ```
 
-There are also performance benchmark tests:
+还有性能基准的测试：
 
 ```bash
 > ./cmake-build/md5_benchmark
@@ -207,20 +205,20 @@ MD5_Hash/1024         1358 ns         1358 ns       515488
 MD5_Hash/4096         5137 ns         5133 ns       136354
 ```
 
-These figures mean that on this CPU, it takes about 10 nanoseconds to export an MD5 string, 78.6 nanoseconds to complete a 64-byte update, and 5.133 microseconds to complete a 4 KiB hash calculation.
+这些数据意味着，在这颗 CPU 上，导出一次 MD5 字符串需要约 10 纳秒，完成 64 字节的更新需要 78.6 纳秒，完成 4 KiB 的哈希计算需要 5.133 微秒。
 
-Hash speed is directly related to the single-core performance of the CPU. In most scenarios, the performance bottleneck lies in the CPU rather than the IO part. If you need to verify a large amount of data, xxHash or BLAKE3 will be a more suitable choice.
+哈希速度与 CPU 的单核性能有直接关系，绝大多数场景下，性能瓶颈在于 CPU 而非 IO 部分。如果您需要校验大量数据，xxHash 或者 BLAKE3 将会是更合适的选择。
 
-## Binary Demo
+## 二进制示例
 
-This project also provides a demonstration sample, which can calculate the MD5 value of a file. You need to use the following command to compile:
+本项目同时提供了一个演示样例，它可以实现对文件的 MD5 值计算，您需要使用以下命令编译：
 
 ```bash
 > cmake -DMD5_BUILD_DEMO=ON -Bcmake-build
 > cmake --build cmake-build
 ```
 
-Generate an 8GiB empty file for testing:
+生成一个 8GiB 的空文件用于测试：
 
 ```bash
 > dd if=/dev/zero of=test.dat bs=1GiB count=8
@@ -232,7 +230,7 @@ Generate an 8GiB empty file for testing:
 8589934592	test.dat
 ```
 
-Count their respective times:
+统计它们各自的用时：
 
 ```bash
 > time ./cmake-build/md5_demo test.dat
@@ -257,25 +255,25 @@ user    0m10.243s
 sys     0m1.252s
 ```
 
-## Advanced
+## 高级选项
 
-The following options are reserved in the project's CMake configuration, and you can switch them as needed.
+在项目的 CMake 配置中预留了以下选项，您可以按需进行开关。
 
-+ `MD5_BUILD_DEMO` : Whether to build demo binary, disabled by default.
++ `MD5_BUILD_DEMO` ：是否构建演示二进制，默认关闭
 
-+ `MD5_SHARED_LIB` ：Whether to build as a dynamic library, disabled by default.
++ `MD5_SHARED_LIB` ：是否构建为动态库，默认关闭
 
-+ `MD5_ENABLE_LTO` ：Whether to enable LTO optimization, enabled by default.
++ `MD5_ENABLE_LTO` ：是否开启 LTO 优化，默认打开
 
-+ `MD5_ENABLE_TESTING` ：Whether to build project unit tests, disabled by default.
++ `MD5_ENABLE_TESTING` ：是否构建项目单元测试，默认关闭
 
-+ `MD5_ENABLE_BENCHMARK` ：Whether to build performance benchmark suites, disabled by default.
++ `MD5_ENABLE_BENCHMARK` ：是否构建性能基准套件，默认关闭
 
-> Note: If you use the Clang compiler and ld linker, since the GNU tools do not understand LLVM bytecode, you need to turn off LTO to link normally, or you can add the `-fuse-ld=lld` option to switch to the lld linker. Generally speaking, Linux users are not recommended to use Clang to compile this project. Under the current performance benchmark, if the `-march=native` optimization is not enabled, in comparisons of Clang18 versus g++12, it typically lags behind by around 20%.
+> 注意：如果您使用 Clang 编译器和 ld 链接器，由于 GNU 工具并不认识 LLVM 字节码，需要关闭 LTO 才能正常链接，或者您可以增加 `-fuse-ld=lld` 选项切换到 lld 链接器。普遍情况下，Linux 用户并不建议使用 Clang 编译本项目，在当前的性能基准下，如果未开启 `-march=native` 优化，在 Clang18 与 g++12 的对比中，它通常会落后 20% 左右。
 
-In addition, when building as a dynamic library, symbols inside the project will be hidden, which means that after stripping, only the following symbols are exposed:
+此外，在构建为动态库时，项目内部的符号将被隐藏，这意味着 strip 以后，仅有以下符号暴露：
 
-> Since part of the hash interfaces are implemented inline in the header file, the `FinalImpl` symbol will be exposed.
+> 由于部分哈希接口在头文件内联实现，因此 `FinalImpl` 符号将对外暴露。
 
 ```bash
 > cmake -DMD5_SHARED_LIB=ON -Bcmake-build
@@ -293,6 +291,6 @@ In addition, when building as a dynamic library, symbols inside the project will
                  U operator new(unsigned long)@GLIBCXX_3.4
 ```
 
-## License
+## 许可证
 
 MIT ©2024 [@dnomd343](https://github.com/dnomd343)
