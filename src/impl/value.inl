@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sine.inc"
+#include "sine.inl"
 
 namespace md5::value {
 

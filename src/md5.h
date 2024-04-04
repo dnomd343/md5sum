@@ -12,8 +12,8 @@ static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
 
 #define MD5_EXPORT __attribute__ ((visibility ("default")))
 
-#include "impl/value.inc"
-#include "impl/constexpr.inc"
+#include "impl/value.inl"
+#include "impl/constexpr.inl"
 
 namespace md5 {
 
@@ -70,4 +70,4 @@ private:
 
 } // namespace md5
 
-#include "impl/inline.inc"
+#include "impl/inline.inl"
