@@ -50,7 +50,12 @@ else()
     target_compile_options(md5sum PRIVATE -fvisibility=hidden)
 endif()
 
-set(MD5_COMPILE_OPTIONS -fno-rtti -fno-exceptions)
+set(MD5_COMPILE_OPTIONS
+        -fno-rtti
+        -fno-exceptions
+        -fno-unwind-tables
+        -fno-asynchronous-unwind-tables)
+
 target_compile_options(md5sum PRIVATE ${MD5_COMPILE_OPTIONS})
 target_include_directories(md5sum PUBLIC src/)
 
