@@ -16,6 +16,8 @@ static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
 
 #if defined(__clang__) || defined(__GNUC__)
 #define MD5_EXPORT __attribute__ ((visibility ("default")))
+#elif defined(_MSC_VER)
+#define MD5_EXPORT __declspec(dllexport)
 #else
 #define MD5_EXPORT
 #endif
