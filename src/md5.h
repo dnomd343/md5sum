@@ -7,10 +7,18 @@
 static_assert(sizeof(uintptr_t) == 8,
     "Project only works on 64-bits architecture.");
 
+#ifdef _MSC_VER
+static_assert('\x01\x02\x03\x04' == 0x04030201,
+#else
 static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
+#endif
     "Project only works on little-endian architecture.");
 
+#if defined(__clang__) || defined(__GNUC__)
 #define MD5_EXPORT __attribute__ ((visibility ("default")))
+#else
+#define MD5_EXPORT
+#endif
 
 #include "impl/value.inl"
 #include "impl/constexpr.inl"

@@ -36,10 +36,13 @@ constexpr Block GetBlock(const md5_data &data, const uint64_t index) {
     Block block {};
     for (int i = 0; i < 16; ++i) {
         const auto offset = index + i * 4;
-        (block[i] <<= 8) |= GetByte(data, offset + 3);
-        (block[i] <<= 8) |= GetByte(data, offset + 2);
-        (block[i] <<= 8) |= GetByte(data, offset + 1);
-        (block[i] <<= 8) |= GetByte(data, offset + 0);
+        block[i] |= GetByte(data, offset + 3);
+        block[i] <<= 8;
+        block[i] |= GetByte(data, offset + 2);
+        block[i] <<= 8;
+        block[i] |= GetByte(data, offset + 1);
+        block[i] <<= 8;
+        block[i] |= GetByte(data, offset + 0);
     }
     return block;
 }

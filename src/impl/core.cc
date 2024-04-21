@@ -16,17 +16,24 @@ using md5::value::T;
 #define H(x, y, z) (x ^ y ^ z)
 #define I(x, y, z) (y ^ (x | ~z))
 
-#define STEP(i, f, a, b, c, d)                \
+#define MD5_ROUND(i, f, a, b, c, d)           \
     do {                                      \
         a += f(b, c, d) + block[K(i)] + T(i); \
         a = a << S(i) | a >> (32 - S(i));     \
         a += b;                               \
     } while (0)
 
-#define FF(i, ...) STEP((0x00 | i), F, __VA_ARGS__)
-#define GG(i, ...) STEP((0x10 | i), G, __VA_ARGS__)
-#define HH(i, ...) STEP((0x20 | i), H, __VA_ARGS__)
-#define II(i, ...) STEP((0x30 | i), I, __VA_ARGS__)
+#ifdef _MSC_VER
+#define EXPAND(...) __VA_ARGS__
+#define ROUND(...) EXPAND(MD5_ROUND(__VA_ARGS__))
+#else
+#define ROUND MD5_ROUND
+#endif
+
+#define FF(i, ...) ROUND(i | 0x00, F, __VA_ARGS__)
+#define GG(i, ...) ROUND(i | 0x10, G, __VA_ARGS__)
+#define HH(i, ...) ROUND(i | 0x20, H, __VA_ARGS__)
+#define II(i, ...) ROUND(i | 0x30, I, __VA_ARGS__)
 
 #define MD5_UPDATE(OP)                                  \
     OP(0x0, R1); OP(0x1, R2); OP(0x2, R3); OP(0x3, R4); \
