@@ -33,7 +33,7 @@ set(CMAKE_CXX_STANDARD ${MD5_CXX_STANDARD})
 
 # ------------------------------------------------------------------------------------ #
 
-if (NOT CMAKE_BUILD_TYPE)
+if (NOT CMAKE_BUILD_TYPE OR MSVC)
   set(CMAKE_BUILD_TYPE Release)  # using release build in default
 endif()
 
