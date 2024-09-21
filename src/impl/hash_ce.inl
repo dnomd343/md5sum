@@ -84,8 +84,8 @@ constexpr std::array<char, 32> DigestCE(const std::array<uint32_t, 4> &ctx) {
 /// MD5 hash implement based on constexpr.
 constexpr std::array<char, 32> Hash(const char *data, const uint64_t len) {
     md5_ctx ctx;
-    const md5_data md5(data, len);
-    for (uint32_t index = 0; index < md5.padded_len; index += 64) {
+    const md5_data md5 {data, len};
+    for (uint64_t index = 0; index < md5.padded_len; index += 64) {
         const auto [A, B, C, D] = Round(GetBlock(md5, index), ctx);
         ctx.A += A;
         ctx.B += B;
@@ -95,6 +95,6 @@ constexpr std::array<char, 32> Hash(const char *data, const uint64_t len) {
     return DigestCE({ctx.A, ctx.B, ctx.C, ctx.D});
 }
 
-static_assert(Hash("", 0)[0] == 'd');
+static_assert(Hash("", 0)[0] == 'd'); // d41d8cd98f00b204e9800998ecf8427e
 
 } // namespace md5::ce

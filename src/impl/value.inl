@@ -48,12 +48,13 @@ static_assert(S(0) != S(63));
     MD5_T(30) MD5_T(31) MD5_T(32) MD5_T(33) MD5_T(34) MD5_T(35) MD5_T(36) MD5_T(37) \
     MD5_T(38) MD5_T(39) MD5_T(3a) MD5_T(3b) MD5_T(3c) MD5_T(3d) MD5_T(3e) MD5_T(3f)
 
-#define MD5_T(x) constexpr auto kT_##x = static_cast<uint32_t>(math::abs(math::sin(0x##x + 1)) * 0x100000000);
+#define MD5_T(x) constexpr auto kT_##x = \
+    static_cast<uint32_t>(math::abs(math::sin(0x##x + 1)) * 0x1'0000'0000);
 MD5_TT
 #undef MD5_T
 
 #define MD5_T(x) kT_##x,
-constexpr std::array kT = {MD5_TT};
+constexpr std::array kT {MD5_TT};
 #undef MD5_T
 
 #undef MD5_TT

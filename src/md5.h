@@ -23,7 +23,7 @@ static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__,
 #endif
 
 #include "impl/value.inl"
-#include "impl/constexpr.inl"
+#include "impl/hash_ce.inl"
 
 namespace md5 {
 
