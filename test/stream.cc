@@ -26,3 +26,15 @@ TEST(md5sum, stream) {
         md5.Reset(); // reset for next round
     }
 }
+
+TEST(md5sum, overflow) {
+    const auto test_data = build_test_data(64 * 1024 * 1024); // 64 MiB
+
+    MD5 md5;
+    for (int num = 0; num < 65; ++num) { // 4 GiB + 64 MiB
+        md5.Update(test_data);
+    }
+    md5.Update(test_data.c_str(), 343); // 343 Bytes
+
+    EXPECT_EQ(md5.Final().Digest(), "9593e87ff33818d6f8fd563282dfcbce");
+}
