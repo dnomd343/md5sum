@@ -25,7 +25,7 @@ inline std::string MD5::Hash(const std::string_view &data) {
     return Hash(data.data(), data.size());
 }
 
-inline std::string MD5::Hash(const void *data, const uint64_t len) {
+inline std::string MD5::Hash(const void *data, const size_t len) {
     MD5 md5;
     md5.FinalImpl(data, len);
     return md5.Digest();
@@ -35,7 +35,7 @@ constexpr std::array<char, 32> MD5::HashCE(const std::string_view &data) {
     return HashCE(data.data(), data.size());
 }
 
-constexpr std::array<char, 32> MD5::HashCE(const char *data, const uint64_t len) {
+constexpr std::array<char, 32> MD5::HashCE(const char *data, const size_t len) {
     return ce::Hash(data, len);
 }
 

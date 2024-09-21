@@ -35,7 +35,7 @@ public:
     MD5& Update(const std::string_view &data);
 
     /// Update md5 hash with specified data.
-    MD5_EXPORT MD5& Update(const void *data, uint64_t len);
+    MD5_EXPORT MD5& Update(const void *data, size_t len);
 
     /// Stop streaming updates and calculate result.
     MD5& Final();
@@ -47,13 +47,13 @@ public:
     static std::string Hash(const std::string_view &data);
 
     /// Calculate the md5 hash value of the specified data.
-    static std::string Hash(const void *data, uint64_t len);
+    static std::string Hash(const void *data, size_t len);
 
     /// Calculate the md5 hash value of the specified data with constexpr.
     static constexpr std::array<char, 32> HashCE(const std::string_view &data);
 
     /// Calculate the md5 hash value of the specified data with constexpr.
-    static constexpr std::array<char, 32> HashCE(const char *data, uint64_t len);
+    static constexpr std::array<char, 32> HashCE(const char *data, size_t len);
 
 private:
     struct md5_ctx {
@@ -61,18 +61,18 @@ private:
         uint32_t B = value::kB;
         uint32_t C = value::kC;
         uint32_t D = value::kD;
-        uint64_t size = 0; // processed size in byte
+        size_t size = 0; // processed size in byte
     };
 
     md5_ctx ctx_;
     char buffer_[64] {};
-    uint64_t buffer_size_ = 0; // size < 64
+    size_t buffer_size_ = 0; // size < 64
 
     /// Update md5 ctx with specified data, and return the pointer of unprocessed data (< 64 bytes).
-    const void* UpdateImpl(const void *data, uint64_t len);
+    const void* UpdateImpl(const void *data, size_t len);
 
     /// Update and final the md5 hash with the specified data.
-    MD5_EXPORT void FinalImpl(const void *data, uint64_t len);
+    MD5_EXPORT void FinalImpl(const void *data, size_t len);
 };
 
 } // namespace md5

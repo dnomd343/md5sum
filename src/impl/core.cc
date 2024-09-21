@@ -43,9 +43,10 @@ using md5::value::T;
 
 static constexpr unsigned char Padding[64] { 0x80, /* 0x00, ... */ };
 
-const void* MD5::UpdateImpl(const void *data, uint64_t len) {
+const void* MD5::UpdateImpl(const void *data, size_t len) {
+    len &= ~static_cast<size_t>(0b111111); // len -> n * 64
     auto *block = static_cast<const uint32_t *>(data);
-    auto *limit = block + ((len &= ~0b111111ULL) >> 2);
+    auto *limit = block + (len >> 2);
 
     auto A = ctx_.A;
     auto B = ctx_.B;
@@ -76,7 +77,7 @@ const void* MD5::UpdateImpl(const void *data, uint64_t len) {
     return limit;
 }
 
-void MD5::FinalImpl(const void *data, uint64_t len) {
+void MD5::FinalImpl(const void *data, size_t len) {
     if (len >= 120) { // len -> [64 + 56, INF)
         data = UpdateImpl(data, len);
         len &= 0b111111; // len -> [0, 64)

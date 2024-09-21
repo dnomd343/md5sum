@@ -2,9 +2,9 @@
 
 #include <string>
 
-inline std::string build_test_data(const uint32_t size) {
+inline std::string build_test_data(const size_t size) {
     std::string data(size, 0x00);
-    for (uint32_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         data[i] = static_cast<char>(i);
     }
     return data;

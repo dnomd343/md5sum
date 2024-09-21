@@ -5,7 +5,7 @@ using md5::MD5;
 
 std::string build_test_data() {
     std::string data(65536, 0x00);
-    for (uint32_t i = 0; i < data.size(); ++i) {
+    for (size_t i = 0; i < data.size(); ++i) {
         data[i] = static_cast<char>(i & 0xff);
     }
     return data;

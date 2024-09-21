@@ -13,7 +13,7 @@ std::string MD5::Digest() const {
     return result;
 }
 
-MD5& MD5::Update(const void *data, uint64_t len) {
+MD5& MD5::Update(const void *data, size_t len) {
     if (buffer_size_ != 0) {
         if (buffer_size_ + len < 64) { // buffer not filled
             std::memcpy(buffer_ + buffer_size_, data, len);

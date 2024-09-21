@@ -11,28 +11,30 @@ struct md5_ctx {
 
 struct md5_data {
     const char *ptr;
-    uint64_t len, padded_len;
+    size_t len, padded_len;
 
-    constexpr md5_data(const char *data, const uint64_t len)
-        : ptr(data), len(len), padded_len((len + 64 + 8) & ~0b111111ULL) {}
+    constexpr md5_data(const char *data, const size_t len) :
+        ptr(data), len(len),
+        padded_len((len + 64 + 8) & ~static_cast<size_t>(0b111111)) {}
 };
 
 using Block = std::array<uint32_t, 16>; // single md5 block with 64 bytes
 
 /// Get the data and padding byte of the specified index.
-constexpr uint8_t GetByte(const md5_data &data, const uint64_t index) {
+constexpr uint8_t GetByte(const md5_data &data, const size_t index) {
     if (index < data.len) // message data
         return data.ptr[index];
     if (index == data.len) // padding flag
         return 0x80;
     if (index < data.padded_len - 8) // padding content
         return 0x00;
+    const auto total = static_cast<uint64_t>(data.len * 8);
     const auto offset = (index + 8 - data.padded_len) * 8;
-    return static_cast<uint8_t>(0xff & (data.len * 8) >> offset);
+    return static_cast<uint8_t>((total >> offset) & 0xff);
 }
 
 /// Get the MD5 block content at the specified index.
-constexpr Block GetBlock(const md5_data &data, const uint64_t index) {
+constexpr Block GetBlock(const md5_data &data, const size_t index) {
     Block block {};
     for (int i = 0; i < 16; ++i) {
         const auto offset = index + i * 4;
@@ -82,10 +84,10 @@ constexpr std::array<char, 32> DigestCE(const std::array<uint32_t, 4> &ctx) {
 }
 
 /// MD5 hash implement based on constexpr.
-constexpr std::array<char, 32> Hash(const char *data, const uint64_t len) {
+constexpr std::array<char, 32> Hash(const char *data, const size_t len) {
     md5_ctx ctx;
     const md5_data md5 {data, len};
-    for (uint64_t index = 0; index < md5.padded_len; index += 64) {
+    for (size_t index = 0; index < md5.padded_len; index += 64) {
         const auto [A, B, C, D] = Round(GetBlock(md5, index), ctx);
         ctx.A += A;
         ctx.B += B;
