@@ -4,9 +4,6 @@
 #include <string>
 #include <cstdint>
 
-static_assert(sizeof(uintptr_t) == 8,
-    "Project only works on 64-bits architecture.");
-
 #ifdef _MSC_VER
 static_assert('\x01\x02\x03\x04' == 0x04030201,
 #else

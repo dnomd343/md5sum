@@ -8,7 +8,7 @@ TEST(md5sum, stream) {
     const auto test_data = build_test_data(256 * 256);
 
     MD5 md5;
-    for (uint64_t size = 1; size <= 256; ++size) {
+    for (uint32_t size = 1; size <= 256; ++size) {
         auto expect = MD5::Hash(test_data.data(), size * 256);
 
         for (int times = 0; times < 256; ++times) {
