@@ -61,7 +61,7 @@ private:
         uint32_t B = value::kB;
         uint32_t C = value::kC;
         uint32_t D = value::kD;
-        size_t size = 0; // processed size in byte
+        uint64_t size = 0; // processed size in byte
     };
 
     md5_ctx ctx_;
